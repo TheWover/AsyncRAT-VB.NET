@@ -67,6 +67,7 @@ Partial Class RemoteDesktop
         Me.Controls.Add(Me.Button1)
         Me.Controls.Add(Me.PictureBox1)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
+        Me.MinimumSize = New System.Drawing.Size(720, 480)
         Me.Name = "RemoteDesktop"
         Me.Text = " RemoteDesktop"
         CType(Me.PictureBox1, System.ComponentModel.ISupportInitialize).EndInit()

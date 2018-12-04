@@ -41,9 +41,9 @@
                         If RD IsNot Nothing Then
 
                             RD.Text = " Remote Desktop " + C.IP.Split(":")(0) + " [" + _Size(b.LongLength) + "]"
-                            Dim MM = New IO.MemoryStream(Text.Encoding.Default.GetBytes(A(1)))
-                            RD.PictureBox1.Image = Image.FromStream(MM)
-                            MM.Dispose()
+                            Using MM As IO.MemoryStream = New IO.MemoryStream(Text.Encoding.Default.GetBytes(A(1)))
+                                RD.PictureBox1.Image = Image.FromStream(MM)
+                            End Using
                             If RD.Button1.Text = "Capturing..." AndAlso RD.isOK = True Then
                                 Dim Bb As Byte() = SB("RD+" + Settings.SPL + RD.PictureBox1.Width.ToString + Settings.SPL + RD.PictureBox1.Height.ToString)
                                 Try

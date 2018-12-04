@@ -23,8 +23,8 @@ Public Class Client
 
         C = CL
         S = SR
-        C.ReceiveBufferSize = 1024 * 500
-        C.SendBufferSize = 1024 * 500
+        C.ReceiveBufferSize = 1024 * 50
+        C.SendBufferSize = 1024 * 50
         IsConnected = True
         BufferLength = -1
         Buffer = New Byte(0) {}
@@ -84,13 +84,13 @@ Public Class Client
         End Try
     End Sub
 
-    Sub Send(ByVal b As Byte())
-        Try
-            Threading.ThreadPool.QueueUserWorkItem(New Threading.WaitCallback(AddressOf BeginSend), b)
-        Catch ex As Exception
-            isDisconnected()
-        End Try
-    End Sub
+    'Sub Send(ByVal b As Byte())
+    '    Try
+    '        Threading.ThreadPool.QueueUserWorkItem(New Threading.WaitCallback(AddressOf BeginSend), b)
+    '    Catch ex As Exception
+    '        isDisconnected()
+    '    End Try
+    'End Sub
 
     Async Sub BeginSend(ByVal Data As Byte())
         Try
@@ -127,7 +127,9 @@ Public Class Client
                 Messages.F.Invoke(New _isDisconnected(AddressOf isDisconnected))
                 Exit Sub
             Else
-                L.Remove()
+                If L IsNot Nothing Then
+                    L.Remove()
+                End If
             End If
         Catch ex As Exception
             Debug.WriteLine("L.Remove " + ex.Message)

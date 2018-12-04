@@ -44,6 +44,7 @@ Public Class Pending
                     Messages.Read(ClientReq.C, ClientReq.B)
                 End If
             Catch ex As Exception
+                Debug.WriteLine("Incoming " + ex.Message)
             End Try
         End While
     End Sub
@@ -60,6 +61,7 @@ Public Class Pending
                     ClientReq.C.BeginSend(ClientReq.B)
                 End If
             Catch ex As Exception
+                Debug.WriteLine("OutComing " + ex.Message)
             End Try
         End While
     End Sub

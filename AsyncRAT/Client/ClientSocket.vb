@@ -31,8 +31,8 @@ Public Class ClientSocket
             Buffer = New Byte(0) {}
             MS = New MemoryStream
 
-            S.ReceiveBufferSize = 1024 * 500
-            S.SendBufferSize = 1024 * 500
+            S.ReceiveBufferSize = 1024 * 50
+            S.SendBufferSize = 1024 * 50
 
             S.Connect(ipEndPoint)
 
