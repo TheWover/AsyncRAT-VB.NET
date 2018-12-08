@@ -39,10 +39,10 @@ Public Class Server
     Sub EndAccept(ByVal ar As IAsyncResult)
         Try
             Dim C As Client = New Client(S.EndAccept(ar), Me)
-            allDone.Set()
         Catch ex As Exception
             Debug.WriteLine("EndAccept " + ex.Message)
         End Try
+        allDone.Set()
     End Sub
 
 End Class
