@@ -33,6 +33,7 @@ Public Class Client
 
         If S.Blocked.Contains(IP.Split(":")(0)) Then
             isDisconnected()
+            Debug.WriteLine("Blocked " + IP.Split(":")(0))
         Else
             C.BeginReceive(Buffer, 0, Buffer.Length, SocketFlags.None, New AsyncCallback(AddressOf BeginReceive), C)
         End If
@@ -123,13 +124,13 @@ Public Class Client
         IsConnected = False
 
         Try
-            If Messages.F.InvokeRequired Then
-                Messages.F.Invoke(New _isDisconnected(AddressOf isDisconnected))
-                Exit Sub
-            Else
-                If L IsNot Nothing Then
+            If L IsNot Nothing Then
+                If Messages.F.InvokeRequired Then
+                    Messages.F.Invoke(New _isDisconnected(AddressOf isDisconnected))
+                    Exit Sub
+                Else
                     L.Remove()
-                End If
+            End If
             End If
         Catch ex As Exception
             Debug.WriteLine("L.Remove " + ex.Message)

@@ -8,7 +8,7 @@
 
 
 Public Class TaskWorker
-    Public List As New List(Of String)
+    Public List As List(Of String)
     Public B As Byte()
     Public Task As String
     Public F As Form1
@@ -24,7 +24,6 @@ Public Class TaskWorker
                 Exit Sub
             Else
 
-                Threading.Thread.Sleep(1)
                 Try
                     For Each L As ListViewItem In F.ListView1.Items
                         If L.Tag = Task Then

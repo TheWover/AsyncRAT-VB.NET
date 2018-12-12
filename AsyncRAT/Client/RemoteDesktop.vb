@@ -24,7 +24,7 @@ Public Class RemoteDesktop
             g2.CompositingQuality = CompositingQuality.HighSpeed
             g2.DrawImage(B, New Rectangle(0, 0, W, H), New Rectangle(0, 0, Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height), GraphicsUnit.Pixel)
 
-            Dim encoderParameter As EncoderParameter = New EncoderParameter(Encoder.Quality, 40)
+            Dim encoderParameter As EncoderParameter = New EncoderParameter(Encoder.Quality, 50) '50 or 50+
             Dim encoderInfo As ImageCodecInfo = GetEncoderInfo(ImageFormat.Jpeg)
             Dim encoderParameters As EncoderParameters = New EncoderParameters(1)
             encoderParameters.Param(0) = encoderParameter

