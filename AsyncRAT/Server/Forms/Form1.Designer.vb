@@ -191,7 +191,7 @@ Partial Class Form1
         'Timer_Status
         '
         Me.Timer_Status.Enabled = True
-        Me.Timer_Status.Interval = 1000
+        Me.Timer_Status.Interval = 500
         '
         'TabControl1
         '
@@ -284,7 +284,7 @@ Partial Class Form1
         Me.MinimumSize = New System.Drawing.Size(953, 378)
         Me.Name = "Form1"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
-        Me.Text = " AsyncRAT v1.0B"
+        Me.Text = " AsyncRAT v1.0C"
         Me.ClientMenu.ResumeLayout(False)
         Me.StatusStrip1.ResumeLayout(False)
         Me.StatusStrip1.PerformLayout()

@@ -1,6 +1,6 @@
 ﻿
 '       │ Author     : NYAN CAT
-'       │ Name       : Task scheduler // For low end cpu
+'       │ Name       : Task scheduler
 
 '       Contact Me   : https://github.com/NYAN-x-CAT
 

@@ -132,7 +132,7 @@ Public Class Form1
     Private Sub Timer_Status_Tick(sender As Object, e As EventArgs) Handles Timer_Status.Tick
         Try
             ToolStripStatusLabel1.Text = String.Format("Total Clients [{0}]       Selected Clients [{1}]       Listening Ports [{2}]       Password [{3}]", LV1.Items.Count.ToString, LV1.SelectedItems.Count.ToString, String.Join(",", Settings.Ports.ToList),Settings.KEY)
-            Text = " AsyncRAT v1.0B // " + DateTime.Now
+            Text = " AsyncRAT v1.0C // " + DateTime.Now
         Catch ex As Exception
             Debug.WriteLine("Timer_Status " + ex.Message)
         End Try
