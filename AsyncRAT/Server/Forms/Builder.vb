@@ -54,4 +54,8 @@ Public Class Builder
         End Try
 
     End Sub
+
+    Private Sub Builder_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        TextBox2.Text = String.Join(",", Settings.Ports.ToList)
+    End Sub
 End Class

