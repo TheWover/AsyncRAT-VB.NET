@@ -13,11 +13,13 @@ This project is for learing, If you find any bug or a better way to write please
 
 ## Socket Features
 
-- **Asynchronous**
+- **Stable Connection**
+- **Asynchronous Socket**
+- **Client-Task Manager**
+- **Multi-Hosts**
 - **Multi-Ports**
 - **Multi-Clients**
-- **Buffered**
-- **Encrypted**
+- **Encrypted Traffic**
 
 
 ---
