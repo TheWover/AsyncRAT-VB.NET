@@ -60,7 +60,7 @@
             End Select
             Exit Sub
         Catch ex As Exception
-            Debug.WriteLine("Messages" + ex.Message)
+            Debug.WriteLine("Messages " + ex.Message)
         End Try
     End Sub
 

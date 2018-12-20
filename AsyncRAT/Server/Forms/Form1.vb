@@ -167,6 +167,8 @@ Public Class Form1
 
        │ This program is distributed for educational purposes only.
 
+       │ Feel free to modify this software but a credit and a link back to my GitHub is needed
+
 
 ")
     End Sub
