@@ -23,8 +23,8 @@ Public Class Client
 
         C = CL
         S = SR
-        C.ReceiveBufferSize = 1024 * 50
-        C.SendBufferSize = 1024 * 50
+        C.ReceiveBufferSize = 8192
+        C.SendBufferSize = 8192
         IsConnected = True
         BufferLength = -1
         Buffer = New Byte(0) {}
@@ -34,6 +34,7 @@ Public Class Client
         If S.Blocked.Contains(IP.Split(":")(0)) Then
             isDisconnected()
             Debug.WriteLine("Blocked " + IP.Split(":")(0))
+            Return
         Else
             C.BeginReceive(Buffer, 0, Buffer.Length, SocketFlags.None, New AsyncCallback(AddressOf BeginReceive), C)
         End If
@@ -58,7 +59,7 @@ Public Class Client
                         End If
                         Buffer = New Byte(BufferLength - 1) {}
                     Else
-                        MS.WriteByte(Buffer(0))
+                        Await MS.WriteAsync(Buffer, 0, Buffer.Length)
                     End If
                 Else
                     Await MS.WriteAsync(Buffer, 0, Received)
@@ -84,14 +85,6 @@ Public Class Client
             Exit Sub
         End Try
     End Sub
-
-    'Sub Send(ByVal b As Byte())
-    '    Try
-    '        Threading.ThreadPool.QueueUserWorkItem(New Threading.WaitCallback(AddressOf BeginSend), b)
-    '    Catch ex As Exception
-    '        isDisconnected()
-    '    End Try
-    'End Sub
 
     Async Sub BeginSend(ByVal Data As Byte())
         Try

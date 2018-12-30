@@ -1,4 +1,6 @@
-﻿Module Helper
+﻿Imports Microsoft.Win32
+
+Module Helper
 
     Function SB(ByVal s As String) As Byte()
         Return Text.Encoding.Default.GetBytes(s)
@@ -75,6 +77,33 @@
             sb.Append(Chr.Substring(idx, 1))
         Next
         Return sb.ToString
+    End Function
+
+
+    Function DLV(ByVal n As String) As Boolean
+        Try
+            Registry.CurrentUser.CreateSubKey("Software\AsyncRAT").DeleteValue(n)
+            Return True
+        Catch ex As Exception
+            Return False
+        End Try
+    End Function
+
+    Function GTV(ByVal n As String) As String
+        Try
+            Return Registry.CurrentUser.CreateSubKey("Software\AsyncRAT").GetValue(n, "")
+        Catch ex As Exception
+            Return Nothing
+        End Try
+    End Function
+
+    Function STV(ByVal n As String, ByVal t As String) As Boolean
+        Try
+            Registry.CurrentUser.CreateSubKey("Software\AsyncRAT").SetValue(n, t)
+            Return True
+        Catch ex As Exception
+            Return False
+        End Try
     End Function
 
 End Module

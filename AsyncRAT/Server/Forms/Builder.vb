@@ -57,7 +57,7 @@ Public Class Builder
                         IconChanger.InjectIcon(o.FileName, PictureBox1.ImageLocation)
                     End If
 
-                    MsgBox("Done!", MsgBoxStyle.Information)
+                    MessageBox.Show(o.FileName, "Done!", MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1)
                     Me.Close()
                 End With
             End If

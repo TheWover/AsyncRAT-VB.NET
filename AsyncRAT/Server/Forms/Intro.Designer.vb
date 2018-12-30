@@ -85,6 +85,7 @@ Partial Class Intro
         Me.Controls.Add(Me.Button1)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.Name = "Intro"
+        Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent
         Me.Text = "AsyncRAT"
         Me.TopMost = True
         Me.ResumeLayout(False)

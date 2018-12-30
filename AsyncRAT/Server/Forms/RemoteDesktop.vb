@@ -54,7 +54,6 @@ Public Class RemoteDesktop
             Dim ClientReq As New Outcoming_Requests(C, B)
             Pending.Req_Out.Add(ClientReq)
         Catch ex As Exception
-            C.isDisconnected()
         End Try
     End Sub
 

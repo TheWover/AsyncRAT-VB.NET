@@ -20,8 +20,8 @@ Public Class Server
             S = New Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp)
             Dim IpEndPoint As IPEndPoint = New IPEndPoint(IPAddress.Any, Port)
 
-            S.ReceiveBufferSize = 1024 * 500
-            S.SendBufferSize = 1024 * 500
+            S.ReceiveBufferSize = 8192
+            S.SendBufferSize = 8192
             S.Bind(IpEndPoint)
             S.Listen(999)
 
@@ -31,7 +31,11 @@ Public Class Server
                 allDone.WaitOne()
             End While
         Catch ex As Exception
-            MsgBox(ex.Message)
+            MessageBox.Show(ex.Message,
+            "Error",
+            MessageBoxButtons.OK,
+            MessageBoxIcon.Exclamation,
+            MessageBoxDefaultButton.Button1)
             Environment.Exit(0)
         End Try
     End Sub

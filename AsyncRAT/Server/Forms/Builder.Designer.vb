@@ -116,6 +116,7 @@ Partial Class Builder
         Me.Controls.Add(Me.GroupBox1)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.Name = "Builder"
+        Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent
         Me.Text = " Builder"
         Me.GroupBox1.ResumeLayout(False)
         Me.GroupBox1.PerformLayout()

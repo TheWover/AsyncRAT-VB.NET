@@ -170,7 +170,7 @@ Partial Class Form1
         'Timer_Ping
         '
         Me.Timer_Ping.Enabled = True
-        Me.Timer_Ping.Interval = 30000
+        Me.Timer_Ping.Interval = 45000
         '
         'StatusStrip1
         '

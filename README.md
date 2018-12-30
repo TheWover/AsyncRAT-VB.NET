@@ -5,7 +5,7 @@
 	
 ***Remote Administration Tool For Windows***
  ```
-This project is for learing, If you find any bug or a better way to write please contact me.
+This project is for learing, If you find any bug please contact me.
  ```
 
 ---
@@ -15,7 +15,6 @@ This project is for learing, If you find any bug or a better way to write please
 
 - **Stable Connection**
 - **Asynchronous Socket**
-- **Client-Task Manager**
 - **Multi-Hosts**
 - **Multi-Ports**
 - **Multi-Clients**

