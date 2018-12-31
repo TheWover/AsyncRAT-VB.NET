@@ -94,7 +94,7 @@ Public Class Client
                 Await MS.WriteAsync(b, 0, b.Length)
 
                 C.Poll(-1, SelectMode.SelectWrite)
-                C.Send(MS.ToArray, 0, MS.Length, SocketFlags.None)
+                C.BeginSend(MS.ToArray, 0, MS.Length, SocketFlags.None, New AsyncCallback(AddressOf EndSend), C)
             End Using
         Catch ex As Exception
             Debug.WriteLine("BeginSend " + ex.Message)
