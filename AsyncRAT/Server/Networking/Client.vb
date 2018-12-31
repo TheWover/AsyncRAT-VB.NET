@@ -23,8 +23,8 @@ Public Class Client
 
         C = CL
         S = SR
-        C.ReceiveBufferSize = 8192
-        C.SendBufferSize = 8192
+        C.ReceiveBufferSize = 50 * 1000 '8192
+        C.SendBufferSize = 50 * 1000 '8192
         IsConnected = True
         BufferLength = -1
         Buffer = New Byte(0) {}
