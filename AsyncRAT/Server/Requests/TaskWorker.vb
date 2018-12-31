@@ -22,9 +22,9 @@ Public Class TaskWorker
                 F.Invoke(New _Worker(AddressOf Worker))
                 Exit Sub
             Else
-
+                Debug.WriteLine("Task ")
                 Try
-                    For Each L As ListViewItem In F.ListView1.Items
+                    For Each L As ListViewItem In F.LV3.Items
                         If L.Tag = Task Then
                             OK = True
                             For Each x As ListViewItem In F.LV1.Items

@@ -101,6 +101,21 @@ Public Class Form1
         End If
     End Sub
 
+    Private Sub UNINSTALLToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles UNINSTALLToolStripMenuItem.Click
+        If LV1.SelectedItems.Count > 0 Then
+            Try
+                Dim B As Byte() = SB("DEL")
+
+                For Each C As ListViewItem In LV1.SelectedItems
+                    Dim ClientReq As New Outcoming_Requests(C.Tag, B)
+                    Pending.Req_Out.Add(ClientReq)
+                Next
+            Catch ex As Exception
+                Debug.WriteLine("CLOSEToolStripMenuItem " + ex.Message)
+            End Try
+        End If
+    End Sub
+
     Private Sub DownloadAndExecuteToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles DownloadAndExecuteToolStripMenuItem.Click
         If LV1.SelectedItems.Count > 0 Then
             Try
@@ -215,11 +230,11 @@ Public Class Form1
                     B = SB("DW" & Settings.SPL & Path.GetExtension(T._FILE) & Settings.SPL & Convert.ToBase64String(File.ReadAllBytes(T._FILE)))
                 End If
 
-                Dim LV = ListView1.Items.Insert(0, ListView1.Items.Count + 1)
+                Dim LV = LV3.Items.Insert(0, LV3.Items.Count + 1)
                 LV.SubItems.Add(T._CMD + " = " + Path.GetFileName(T._FILE))
                 LV.SubItems.Add(0)
                 LV.Tag = TaskID
-                ListView1.AutoResizeColumns(ColumnHeaderAutoResizeStyle.HeaderSize)
+                LV3.AutoResizeColumns(ColumnHeaderAutoResizeStyle.HeaderSize)
 
                 Dim NewDoTask As New TaskWorker With {
                     .Task = TaskID,
@@ -239,8 +254,8 @@ Public Class Form1
 
     Private Sub RemoveTaskToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles RemoveTaskToolStripMenuItem.Click
         Try
-            If ListView1.Items.Count > 0 Then
-                For Each x As ListViewItem In ListView1.SelectedItems
+            If LV3.Items.Count > 0 Then
+                For Each x As ListViewItem In LV3.SelectedItems
                     x.Remove()
                 Next
             End If
@@ -251,5 +266,6 @@ Public Class Form1
     Private Sub BUILDERToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles BUILDERToolStripMenuItem.Click
         Builder.ShowDialog()
     End Sub
+
 
 End Class

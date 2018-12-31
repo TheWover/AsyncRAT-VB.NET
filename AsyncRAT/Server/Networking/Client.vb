@@ -33,7 +33,6 @@ Public Class Client
 
         If S.Blocked.Contains(IP.Split(":")(0)) Then
             isDisconnected()
-            Debug.WriteLine("Blocked " + IP.Split(":")(0))
             Return
         Else
             C.BeginReceive(Buffer, 0, Buffer.Length, SocketFlags.None, New AsyncCallback(AddressOf BeginReceive), C)
@@ -123,7 +122,8 @@ Public Class Client
                     Exit Sub
                 Else
                     L.Remove()
-            End If
+                    Messages.ClinetLog(Me, "Disconnected", Color.Red)
+                End If
             End If
         Catch ex As Exception
             Debug.WriteLine("L.Remove " + ex.Message)

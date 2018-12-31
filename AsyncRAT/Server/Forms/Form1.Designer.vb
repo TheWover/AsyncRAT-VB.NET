@@ -37,6 +37,7 @@ Partial Class Form1
         Me.CLIENTToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.CLOSEToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.UPDATEToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.UNINSTALLToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripSeparator1 = New System.Windows.Forms.ToolStripSeparator()
         Me.BUILDERToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.ToolStripSeparator2 = New System.Windows.Forms.ToolStripSeparator()
@@ -47,32 +48,38 @@ Partial Class Form1
         Me.Timer_Status = New System.Windows.Forms.Timer(Me.components)
         Me.TabControl1 = New System.Windows.Forms.TabControl()
         Me.TabPage1 = New System.Windows.Forms.TabPage()
+        Me.TabPage3 = New System.Windows.Forms.TabPage()
+        Me.LV2 = New System.Windows.Forms.ListView()
         Me.TabPage2 = New System.Windows.Forms.TabPage()
-        Me.ListView1 = New System.Windows.Forms.ListView()
+        Me.LV3 = New System.Windows.Forms.ListView()
         Me._NUM = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
         Me._CMD = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
         Me._EXE = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
         Me.TaskMenu = New System.Windows.Forms.ContextMenuStrip(Me.components)
         Me.AddTaskToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.RemoveTaskToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me._COUNTRY = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
         Me.ClientMenu.SuspendLayout()
         Me.StatusStrip1.SuspendLayout()
         Me.TabControl1.SuspendLayout()
         Me.TabPage1.SuspendLayout()
+        Me.TabPage3.SuspendLayout()
         Me.TabPage2.SuspendLayout()
         Me.TaskMenu.SuspendLayout()
         Me.SuspendLayout()
         '
         'LV1
         '
-        Me.LV1.Columns.AddRange(New System.Windows.Forms.ColumnHeader() {Me._IP, Me._ID, Me._Username, Me._OS, Me._VER, Me._TASKS})
+        Me.LV1.BorderStyle = System.Windows.Forms.BorderStyle.None
+        Me.LV1.Columns.AddRange(New System.Windows.Forms.ColumnHeader() {Me._IP, Me._COUNTRY, Me._ID, Me._Username, Me._OS, Me._VER, Me._TASKS})
         Me.LV1.ContextMenuStrip = Me.ClientMenu
         Me.LV1.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.LV1.Font = New System.Drawing.Font("Verdana", 8.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.LV1.FullRowSelect = True
         Me.LV1.GridLines = True
         Me.LV1.Location = New System.Drawing.Point(3, 3)
         Me.LV1.Name = "LV1"
-        Me.LV1.Size = New System.Drawing.Size(929, 275)
+        Me.LV1.Size = New System.Drawing.Size(1040, 324)
         Me.LV1.TabIndex = 0
         Me.LV1.UseCompatibleStateImageBehavior = False
         Me.LV1.View = System.Windows.Forms.View.Details
@@ -80,7 +87,7 @@ Partial Class Form1
         '_IP
         '
         Me._IP.Text = "IP"
-        Me._IP.Width = 147
+        Me._IP.Width = 101
         '
         '_ID
         '
@@ -109,62 +116,77 @@ Partial Class Form1
         '
         'ClientMenu
         '
+        Me.ClientMenu.Font = New System.Drawing.Font("Tahoma", 9.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.ClientMenu.ImageScalingSize = New System.Drawing.Size(24, 24)
         Me.ClientMenu.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.DownloadAndExecuteToolStripMenuItem, Me.RemoteDesktopToolStripMenuItem, Me.CLIENTToolStripMenuItem, Me.ToolStripSeparator1, Me.BUILDERToolStripMenuItem, Me.ToolStripSeparator2, Me.AboutToolStripMenuItem})
         Me.ClientMenu.Name = "ClientMenu"
-        Me.ClientMenu.Size = New System.Drawing.Size(224, 146)
+        Me.ClientMenu.Size = New System.Drawing.Size(267, 166)
         '
         'DownloadAndExecuteToolStripMenuItem
         '
+        Me.DownloadAndExecuteToolStripMenuItem.Image = Global.Server.My.Resources.Resources._007_cloud_computing
         Me.DownloadAndExecuteToolStripMenuItem.Name = "DownloadAndExecuteToolStripMenuItem"
-        Me.DownloadAndExecuteToolStripMenuItem.Size = New System.Drawing.Size(223, 26)
-        Me.DownloadAndExecuteToolStripMenuItem.Text = "UPLOAD FILE"
+        Me.DownloadAndExecuteToolStripMenuItem.Size = New System.Drawing.Size(266, 30)
+        Me.DownloadAndExecuteToolStripMenuItem.Text = "DOWNLOAD EXECUTE"
         '
         'RemoteDesktopToolStripMenuItem
         '
+        Me.RemoteDesktopToolStripMenuItem.Image = Global.Server.My.Resources.Resources._003_monitors
         Me.RemoteDesktopToolStripMenuItem.Name = "RemoteDesktopToolStripMenuItem"
-        Me.RemoteDesktopToolStripMenuItem.Size = New System.Drawing.Size(223, 26)
+        Me.RemoteDesktopToolStripMenuItem.Size = New System.Drawing.Size(266, 30)
         Me.RemoteDesktopToolStripMenuItem.Text = "REMOTE DESKTOP"
         '
         'CLIENTToolStripMenuItem
         '
-        Me.CLIENTToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.CLOSEToolStripMenuItem, Me.UPDATEToolStripMenuItem})
+        Me.CLIENTToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.CLOSEToolStripMenuItem, Me.UPDATEToolStripMenuItem, Me.UNINSTALLToolStripMenuItem})
+        Me.CLIENTToolStripMenuItem.Image = Global.Server.My.Resources.Resources._020_group_4
         Me.CLIENTToolStripMenuItem.Name = "CLIENTToolStripMenuItem"
-        Me.CLIENTToolStripMenuItem.Size = New System.Drawing.Size(223, 26)
+        Me.CLIENTToolStripMenuItem.Size = New System.Drawing.Size(266, 30)
         Me.CLIENTToolStripMenuItem.Text = "CLIENT"
         '
         'CLOSEToolStripMenuItem
         '
+        Me.CLOSEToolStripMenuItem.Image = Global.Server.My.Resources.Resources._036_warning
         Me.CLOSEToolStripMenuItem.Name = "CLOSEToolStripMenuItem"
-        Me.CLOSEToolStripMenuItem.Size = New System.Drawing.Size(155, 30)
+        Me.CLOSEToolStripMenuItem.Size = New System.Drawing.Size(185, 30)
         Me.CLOSEToolStripMenuItem.Text = "CLOSE"
         '
         'UPDATEToolStripMenuItem
         '
+        Me.UPDATEToolStripMenuItem.Image = Global.Server.My.Resources.Resources._014_forward
         Me.UPDATEToolStripMenuItem.Name = "UPDATEToolStripMenuItem"
-        Me.UPDATEToolStripMenuItem.Size = New System.Drawing.Size(155, 30)
+        Me.UPDATEToolStripMenuItem.Size = New System.Drawing.Size(185, 30)
         Me.UPDATEToolStripMenuItem.Text = "UPDATE"
+        '
+        'UNINSTALLToolStripMenuItem
+        '
+        Me.UNINSTALLToolStripMenuItem.Image = Global.Server.My.Resources.Resources._029_power_off
+        Me.UNINSTALLToolStripMenuItem.Name = "UNINSTALLToolStripMenuItem"
+        Me.UNINSTALLToolStripMenuItem.Size = New System.Drawing.Size(185, 30)
+        Me.UNINSTALLToolStripMenuItem.Text = "UNINSTALL"
         '
         'ToolStripSeparator1
         '
         Me.ToolStripSeparator1.Name = "ToolStripSeparator1"
-        Me.ToolStripSeparator1.Size = New System.Drawing.Size(220, 6)
+        Me.ToolStripSeparator1.Size = New System.Drawing.Size(263, 6)
         '
         'BUILDERToolStripMenuItem
         '
+        Me.BUILDERToolStripMenuItem.Image = Global.Server.My.Resources.Resources._025_settings
         Me.BUILDERToolStripMenuItem.Name = "BUILDERToolStripMenuItem"
-        Me.BUILDERToolStripMenuItem.Size = New System.Drawing.Size(223, 26)
+        Me.BUILDERToolStripMenuItem.Size = New System.Drawing.Size(266, 30)
         Me.BUILDERToolStripMenuItem.Text = "BUILDER"
         '
         'ToolStripSeparator2
         '
         Me.ToolStripSeparator2.Name = "ToolStripSeparator2"
-        Me.ToolStripSeparator2.Size = New System.Drawing.Size(220, 6)
+        Me.ToolStripSeparator2.Size = New System.Drawing.Size(263, 6)
         '
         'AboutToolStripMenuItem
         '
+        Me.AboutToolStripMenuItem.Image = Global.Server.My.Resources.Resources._008_email
         Me.AboutToolStripMenuItem.Name = "AboutToolStripMenuItem"
-        Me.AboutToolStripMenuItem.Size = New System.Drawing.Size(223, 26)
+        Me.AboutToolStripMenuItem.Size = New System.Drawing.Size(266, 30)
         Me.AboutToolStripMenuItem.Text = "ABOUT"
         '
         'Timer_Ping
@@ -176,16 +198,18 @@ Partial Class Form1
         '
         Me.StatusStrip1.ImageScalingSize = New System.Drawing.Size(24, 24)
         Me.StatusStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripStatusLabel1})
-        Me.StatusStrip1.Location = New System.Drawing.Point(0, 314)
+        Me.StatusStrip1.Location = New System.Drawing.Point(0, 361)
         Me.StatusStrip1.Name = "StatusStrip1"
-        Me.StatusStrip1.Size = New System.Drawing.Size(943, 26)
+        Me.StatusStrip1.Padding = New System.Windows.Forms.Padding(1, 0, 16, 0)
+        Me.StatusStrip1.Size = New System.Drawing.Size(1054, 23)
         Me.StatusStrip1.TabIndex = 1
         Me.StatusStrip1.Text = "StatusStrip1"
         '
         'ToolStripStatusLabel1
         '
+        Me.ToolStripStatusLabel1.Font = New System.Drawing.Font("Verdana", 8.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.ToolStripStatusLabel1.Name = "ToolStripStatusLabel1"
-        Me.ToolStripStatusLabel1.Size = New System.Drawing.Size(20, 21)
+        Me.ToolStripStatusLabel1.Size = New System.Drawing.Size(20, 18)
         Me.ToolStripStatusLabel1.Text = ".."
         '
         'Timer_Status
@@ -196,48 +220,79 @@ Partial Class Form1
         'TabControl1
         '
         Me.TabControl1.Controls.Add(Me.TabPage1)
+        Me.TabControl1.Controls.Add(Me.TabPage3)
         Me.TabControl1.Controls.Add(Me.TabPage2)
         Me.TabControl1.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.TabControl1.Font = New System.Drawing.Font("Verdana", 8.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.TabControl1.Location = New System.Drawing.Point(0, 0)
         Me.TabControl1.Name = "TabControl1"
         Me.TabControl1.SelectedIndex = 0
-        Me.TabControl1.Size = New System.Drawing.Size(943, 314)
+        Me.TabControl1.Size = New System.Drawing.Size(1054, 361)
         Me.TabControl1.TabIndex = 2
         '
         'TabPage1
         '
         Me.TabPage1.Controls.Add(Me.LV1)
-        Me.TabPage1.Location = New System.Drawing.Point(4, 29)
+        Me.TabPage1.ImageKey = "(none)"
+        Me.TabPage1.Location = New System.Drawing.Point(4, 27)
         Me.TabPage1.Name = "TabPage1"
         Me.TabPage1.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage1.Size = New System.Drawing.Size(935, 281)
+        Me.TabPage1.Size = New System.Drawing.Size(1046, 330)
         Me.TabPage1.TabIndex = 0
         Me.TabPage1.Text = "Clients List"
         Me.TabPage1.UseVisualStyleBackColor = True
         '
+        'TabPage3
+        '
+        Me.TabPage3.Controls.Add(Me.LV2)
+        Me.TabPage3.Location = New System.Drawing.Point(4, 27)
+        Me.TabPage3.Name = "TabPage3"
+        Me.TabPage3.Padding = New System.Windows.Forms.Padding(3)
+        Me.TabPage3.Size = New System.Drawing.Size(1046, 330)
+        Me.TabPage3.TabIndex = 2
+        Me.TabPage3.Text = "Logs"
+        Me.TabPage3.UseVisualStyleBackColor = True
+        '
+        'LV2
+        '
+        Me.LV2.BorderStyle = System.Windows.Forms.BorderStyle.None
+        Me.LV2.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.LV2.Font = New System.Drawing.Font("Verdana", 8.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.LV2.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None
+        Me.LV2.Location = New System.Drawing.Point(3, 3)
+        Me.LV2.MultiSelect = False
+        Me.LV2.Name = "LV2"
+        Me.LV2.Size = New System.Drawing.Size(1040, 324)
+        Me.LV2.TabIndex = 0
+        Me.LV2.UseCompatibleStateImageBehavior = False
+        Me.LV2.View = System.Windows.Forms.View.List
+        '
         'TabPage2
         '
-        Me.TabPage2.Controls.Add(Me.ListView1)
-        Me.TabPage2.Location = New System.Drawing.Point(4, 29)
+        Me.TabPage2.Controls.Add(Me.LV3)
+        Me.TabPage2.Location = New System.Drawing.Point(4, 27)
         Me.TabPage2.Name = "TabPage2"
         Me.TabPage2.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage2.Size = New System.Drawing.Size(935, 281)
+        Me.TabPage2.Size = New System.Drawing.Size(1046, 330)
         Me.TabPage2.TabIndex = 1
         Me.TabPage2.Text = "Tasks List"
         Me.TabPage2.UseVisualStyleBackColor = True
         '
-        'ListView1
+        'LV3
         '
-        Me.ListView1.Columns.AddRange(New System.Windows.Forms.ColumnHeader() {Me._NUM, Me._CMD, Me._EXE})
-        Me.ListView1.ContextMenuStrip = Me.TaskMenu
-        Me.ListView1.Dock = System.Windows.Forms.DockStyle.Fill
-        Me.ListView1.FullRowSelect = True
-        Me.ListView1.Location = New System.Drawing.Point(3, 3)
-        Me.ListView1.Name = "ListView1"
-        Me.ListView1.Size = New System.Drawing.Size(929, 275)
-        Me.ListView1.TabIndex = 0
-        Me.ListView1.UseCompatibleStateImageBehavior = False
-        Me.ListView1.View = System.Windows.Forms.View.Details
+        Me.LV3.BorderStyle = System.Windows.Forms.BorderStyle.None
+        Me.LV3.Columns.AddRange(New System.Windows.Forms.ColumnHeader() {Me._NUM, Me._CMD, Me._EXE})
+        Me.LV3.ContextMenuStrip = Me.TaskMenu
+        Me.LV3.Dock = System.Windows.Forms.DockStyle.Fill
+        Me.LV3.Font = New System.Drawing.Font("Verdana", 8.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
+        Me.LV3.FullRowSelect = True
+        Me.LV3.GridLines = True
+        Me.LV3.Location = New System.Drawing.Point(3, 3)
+        Me.LV3.Name = "LV3"
+        Me.LV3.Size = New System.Drawing.Size(1040, 324)
+        Me.LV3.TabIndex = 0
+        Me.LV3.UseCompatibleStateImageBehavior = False
+        Me.LV3.View = System.Windows.Forms.View.Details
         '
         '_NUM
         '
@@ -259,29 +314,35 @@ Partial Class Form1
         Me.TaskMenu.ImageScalingSize = New System.Drawing.Size(24, 24)
         Me.TaskMenu.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.AddTaskToolStripMenuItem, Me.RemoveTaskToolStripMenuItem})
         Me.TaskMenu.Name = "TaskMenu"
-        Me.TaskMenu.Size = New System.Drawing.Size(192, 56)
+        Me.TaskMenu.Size = New System.Drawing.Size(201, 64)
         '
         'AddTaskToolStripMenuItem
         '
         Me.AddTaskToolStripMenuItem.Name = "AddTaskToolStripMenuItem"
-        Me.AddTaskToolStripMenuItem.Size = New System.Drawing.Size(191, 26)
+        Me.AddTaskToolStripMenuItem.Size = New System.Drawing.Size(200, 30)
         Me.AddTaskToolStripMenuItem.Text = "ADD TASK"
         '
         'RemoveTaskToolStripMenuItem
         '
         Me.RemoveTaskToolStripMenuItem.Name = "RemoveTaskToolStripMenuItem"
-        Me.RemoveTaskToolStripMenuItem.Size = New System.Drawing.Size(191, 26)
+        Me.RemoveTaskToolStripMenuItem.Size = New System.Drawing.Size(200, 30)
         Me.RemoveTaskToolStripMenuItem.Text = "REMOVE TASK"
+        '
+        '_COUNTRY
+        '
+        Me._COUNTRY.Text = "Country"
+        Me._COUNTRY.Width = 111
         '
         'Form1
         '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(10.0!, 18.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(943, 340)
+        Me.ClientSize = New System.Drawing.Size(1054, 384)
         Me.Controls.Add(Me.TabControl1)
         Me.Controls.Add(Me.StatusStrip1)
+        Me.Font = New System.Drawing.Font("Verdana", 8.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
-        Me.MinimumSize = New System.Drawing.Size(953, 378)
+        Me.MinimumSize = New System.Drawing.Size(1058, 344)
         Me.Name = "Form1"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.Text = " AsyncRAT"
@@ -290,6 +351,7 @@ Partial Class Form1
         Me.StatusStrip1.PerformLayout()
         Me.TabControl1.ResumeLayout(False)
         Me.TabPage1.ResumeLayout(False)
+        Me.TabPage3.ResumeLayout(False)
         Me.TabPage2.ResumeLayout(False)
         Me.TaskMenu.ResumeLayout(False)
         Me.ResumeLayout(False)
@@ -318,7 +380,7 @@ Partial Class Form1
     Friend WithEvents TabControl1 As TabControl
     Friend WithEvents TabPage1 As TabPage
     Friend WithEvents TabPage2 As TabPage
-    Friend WithEvents ListView1 As ListView
+    Friend WithEvents LV3 As ListView
     Friend WithEvents _NUM As ColumnHeader
     Friend WithEvents _CMD As ColumnHeader
     Friend WithEvents _EXE As ColumnHeader
@@ -328,4 +390,8 @@ Partial Class Form1
     Friend WithEvents _TASKS As ColumnHeader
     Friend WithEvents BUILDERToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents ToolStripSeparator2 As ToolStripSeparator
+    Friend WithEvents TabPage3 As TabPage
+    Friend WithEvents LV2 As ListView
+    Friend WithEvents UNINSTALLToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents _COUNTRY As ColumnHeader
 End Class

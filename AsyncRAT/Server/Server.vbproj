@@ -8,7 +8,7 @@
     <OutputType>WinExe</OutputType>
     <StartupObject>Server.My.MyApplication</StartupObject>
     <RootNamespace>Server</RootNamespace>
-    <AssemblyName>Server</AssemblyName>
+    <AssemblyName>AsyncRAT</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <MyType>WindowsForms</MyType>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
@@ -20,7 +20,7 @@
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
     <OutputPath>bin\Debug\</OutputPath>
-    <DocumentationFile>Server.xml</DocumentationFile>
+    <DocumentationFile>AsyncRAT.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -30,7 +30,7 @@
     <DefineTrace>true</DefineTrace>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DocumentationFile>Server.xml</DocumentationFile>
+    <DocumentationFile>AsyncRAT.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
   </PropertyGroup>
   <PropertyGroup>
@@ -98,7 +98,8 @@
     <Compile Include="Forms\TaskForm.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="IconChanger.vb" />
+    <Compile Include="Helper\GeoIP.vb" />
+    <Compile Include="Helper\IconChanger.vb" />
     <Compile Include="My Project\Resources.Designer.vb">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -112,7 +113,7 @@
       <DependentUpon>Form1.vb</DependentUpon>
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Helper.vb" />
+    <Compile Include="Helper\Helper.vb" />
     <Compile Include="Requests\Messages.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
     <Compile Include="My Project\Application.Designer.vb">
@@ -164,9 +165,19 @@
       <LastGenOutput>Settings.Designer.vb</LastGenOutput>
     </None>
     <None Include="App.config" />
+    <None Include="Resources\GeoIP.dat" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Icon.ico" />
+    <None Include="Resources\014-forward.png" />
+    <None Include="Resources\036-warning.png" />
+    <None Include="Resources\031-refresh.png" />
+    <None Include="Resources\029-power-off.png" />
+    <None Include="Resources\008-email.png" />
+    <None Include="Resources\025-settings.png" />
+    <None Include="Resources\020-group-4.png" />
+    <None Include="Resources\003-monitors.png" />
+    <None Include="Resources\007-cloud-computing.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.VisualBasic.targets" />
 </Project>

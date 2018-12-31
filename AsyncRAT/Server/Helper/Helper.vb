@@ -61,8 +61,13 @@ Module Helper
         Catch ex As Exception
             Debug.WriteLine("AES_Decryptor" + ex.Message)
             If C.IsConnected Then
-                C.S.Blocked.Add(C.IP.ToString.Split(":")(0))
-                C.isDisconnected()
+                If Not C.S.Blocked.Contains(C.IP.ToString.Split(":")(0)) Then
+                    C.S.Blocked.Add(C.IP.ToString.Split(":")(0))
+                    Messages.ClinetLog(C, "Blocked invalid KEY", Color.Red)
+                    Debug.WriteLine("Blocked " + C.IP.Split(":")(0))
+                    C.isDisconnected()
+                    Exit Function
+                End If
             End If
         End Try
         Return Nothing
