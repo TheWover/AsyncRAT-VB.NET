@@ -20,8 +20,8 @@ Public Class Server
             S = New Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp)
             Dim IpEndPoint As IPEndPoint = New IPEndPoint(IPAddress.Any, Port)
 
-            S.ReceiveBufferSize = 50 * 1000 '8192
-            S.SendBufferSize = 50 * 1000 '8192
+            S.ReceiveBufferSize = 50 * 1000
+            S.SendBufferSize = 50 * 1000
             S.Bind(IpEndPoint)
             S.Listen(999)
 
@@ -45,8 +45,9 @@ Public Class Server
             Dim C As Client = New Client(S.EndAccept(ar), Me)
         Catch ex As Exception
             Debug.WriteLine("EndAccept " + ex.Message)
+        Finally
+            allDone.Set()
         End Try
-        allDone.Set()
     End Sub
 
 End Class

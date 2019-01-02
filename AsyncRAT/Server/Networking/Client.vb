@@ -23,8 +23,8 @@ Public Class Client
 
         C = CL
         S = SR
-        C.ReceiveBufferSize = 50 * 1000 '8192
-        C.SendBufferSize = 50 * 1000 '8192
+        C.ReceiveBufferSize = 50 * 1000
+        C.SendBufferSize = 50 * 1000
         IsConnected = True
         BufferLength = -1
         Buffer = New Byte(0) {}
@@ -41,7 +41,10 @@ Public Class Client
     End Sub
 
     Async Sub BeginReceive(ByVal ar As IAsyncResult)
-        If IsConnected = False Then isDisconnected()
+        If IsConnected = False OrElse Not C.Connected Then
+            isDisconnected()
+            Exit Sub
+        End If
         Try
             Dim Received As Integer = C.EndReceive(ar)
             If Received > 0 Then
@@ -86,20 +89,22 @@ Public Class Client
     End Sub
 
     Async Sub BeginSend(ByVal Data As Byte())
-        Try
-            Using MS As New MemoryStream
-                Dim b As Byte() = AES_Encryptor(Data)
-                Dim L As Byte() = SB(b.Length & CChar(vbNullChar))
-                Await MS.WriteAsync(L, 0, L.Length)
-                Await MS.WriteAsync(b, 0, b.Length)
+        If IsConnected OrElse C.Connected Then
+            Try
+                Using MS As New MemoryStream
+                    Dim b As Byte() = AES_Encryptor(Data)
+                    Dim L As Byte() = SB(b.Length & CChar(vbNullChar))
+                    Await MS.WriteAsync(L, 0, L.Length)
+                    Await MS.WriteAsync(b, 0, b.Length)
 
-                C.Poll(-1, SelectMode.SelectWrite)
-                C.BeginSend(MS.ToArray, 0, MS.Length, SocketFlags.None, New AsyncCallback(AddressOf EndSend), C)
-            End Using
-        Catch ex As Exception
-            Debug.WriteLine("BeginSend " + ex.Message)
-            isDisconnected()
-        End Try
+                    C.Poll(-1, SelectMode.SelectWrite)
+                    C.BeginSend(MS.ToArray, 0, MS.Length, SocketFlags.None, New AsyncCallback(AddressOf EndSend), C)
+                End Using
+            Catch ex As Exception
+                Debug.WriteLine("BeginSend " + ex.Message)
+                isDisconnected()
+            End Try
+        End If
     End Sub
 
     Sub EndSend(ByVal ar As IAsyncResult)
@@ -107,6 +112,7 @@ Public Class Client
             C.EndSend(ar)
         Catch ex As Exception
             Debug.WriteLine("EndSend " + ex.Message)
+            isDisconnected()
         End Try
     End Sub
 

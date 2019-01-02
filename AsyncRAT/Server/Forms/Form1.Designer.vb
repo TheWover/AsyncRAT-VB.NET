@@ -26,6 +26,7 @@ Partial Class Form1
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Form1))
         Me.LV1 = New System.Windows.Forms.ListView()
         Me._IP = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
+        Me._COUNTRY = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
         Me._ID = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
         Me._Username = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
         Me._OS = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
@@ -33,6 +34,8 @@ Partial Class Form1
         Me._TASKS = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
         Me.ClientMenu = New System.Windows.Forms.ContextMenuStrip(Me.components)
         Me.DownloadAndExecuteToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.DROPANDEXECUTEToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.LOADERToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.RemoteDesktopToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.CLIENTToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.CLOSEToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
@@ -58,7 +61,6 @@ Partial Class Form1
         Me.TaskMenu = New System.Windows.Forms.ContextMenuStrip(Me.components)
         Me.AddTaskToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.RemoveTaskToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me._COUNTRY = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
         Me.ClientMenu.SuspendLayout()
         Me.StatusStrip1.SuspendLayout()
         Me.TabControl1.SuspendLayout()
@@ -88,6 +90,11 @@ Partial Class Form1
         '
         Me._IP.Text = "IP"
         Me._IP.Width = 101
+        '
+        '_COUNTRY
+        '
+        Me._COUNTRY.Text = "Country"
+        Me._COUNTRY.Width = 111
         '
         '_ID
         '
@@ -120,14 +127,29 @@ Partial Class Form1
         Me.ClientMenu.ImageScalingSize = New System.Drawing.Size(24, 24)
         Me.ClientMenu.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.DownloadAndExecuteToolStripMenuItem, Me.RemoteDesktopToolStripMenuItem, Me.CLIENTToolStripMenuItem, Me.ToolStripSeparator1, Me.BUILDERToolStripMenuItem, Me.ToolStripSeparator2, Me.AboutToolStripMenuItem})
         Me.ClientMenu.Name = "ClientMenu"
-        Me.ClientMenu.Size = New System.Drawing.Size(267, 166)
+        Me.ClientMenu.Size = New System.Drawing.Size(267, 199)
         '
         'DownloadAndExecuteToolStripMenuItem
         '
+        Me.DownloadAndExecuteToolStripMenuItem.DropDownItems.AddRange(New System.Windows.Forms.ToolStripItem() {Me.DROPANDEXECUTEToolStripMenuItem, Me.LOADERToolStripMenuItem})
         Me.DownloadAndExecuteToolStripMenuItem.Image = Global.Server.My.Resources.Resources._007_cloud_computing
         Me.DownloadAndExecuteToolStripMenuItem.Name = "DownloadAndExecuteToolStripMenuItem"
         Me.DownloadAndExecuteToolStripMenuItem.Size = New System.Drawing.Size(266, 30)
         Me.DownloadAndExecuteToolStripMenuItem.Text = "DOWNLOAD EXECUTE"
+        '
+        'DROPANDEXECUTEToolStripMenuItem
+        '
+        Me.DROPANDEXECUTEToolStripMenuItem.Image = Global.Server.My.Resources.Resources.cloud_computing
+        Me.DROPANDEXECUTEToolStripMenuItem.Name = "DROPANDEXECUTEToolStripMenuItem"
+        Me.DROPANDEXECUTEToolStripMenuItem.Size = New System.Drawing.Size(259, 30)
+        Me.DROPANDEXECUTEToolStripMenuItem.Text = "DROP AND EXECUTE"
+        '
+        'LOADERToolStripMenuItem
+        '
+        Me.LOADERToolStripMenuItem.Image = Global.Server.My.Resources.Resources.cloud_computing
+        Me.LOADERToolStripMenuItem.Name = "LOADERToolStripMenuItem"
+        Me.LOADERToolStripMenuItem.Size = New System.Drawing.Size(259, 30)
+        Me.LOADERToolStripMenuItem.Text = "RUN IN MEMORY"
         '
         'RemoteDesktopToolStripMenuItem
         '
@@ -328,11 +350,6 @@ Partial Class Form1
         Me.RemoveTaskToolStripMenuItem.Size = New System.Drawing.Size(200, 30)
         Me.RemoveTaskToolStripMenuItem.Text = "REMOVE TASK"
         '
-        '_COUNTRY
-        '
-        Me._COUNTRY.Text = "Country"
-        Me._COUNTRY.Width = 111
-        '
         'Form1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(10.0!, 18.0!)
@@ -394,4 +411,6 @@ Partial Class Form1
     Friend WithEvents LV2 As ListView
     Friend WithEvents UNINSTALLToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents _COUNTRY As ColumnHeader
+    Friend WithEvents DROPANDEXECUTEToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents LOADERToolStripMenuItem As ToolStripMenuItem
 End Class

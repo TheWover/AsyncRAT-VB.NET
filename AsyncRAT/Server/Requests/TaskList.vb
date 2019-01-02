@@ -6,7 +6,7 @@
 '       This program is distributed for educational purposes only.
 
 
-Public Class TaskWorker
+Public Class TaskList
     Public List As List(Of String)
     Public B As Byte()
     Public Task As String
