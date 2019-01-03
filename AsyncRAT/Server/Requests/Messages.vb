@@ -11,14 +11,15 @@
 
                 Case "INFO"
                     If F.InvokeRequired Then : F.Invoke(New _Read(AddressOf Read), New Object() {C, b}) : Exit Sub : Else
-
-                        C.L = F.LV1.Items.Insert(0, String.Concat(C.IP.Split(":")(0), ":", C.C.LocalEndPoint.ToString.Split(":")(1)))
-                        C.L.SubItems.Add(Gio.LookupCountryName(C.IP.Split(":")(0)))
+                        C.L = New ListViewItem
                         C.L.Tag = C
+                        C.L.Text = String.Concat(C.IP.Split(":")(0), ":", C.C.LocalEndPoint.ToString.Split(":")(1))
+                        C.L.SubItems.Add(Gio.LookupCountryName(C.IP.Split(":")(0)))
                         For i As Integer = 1 To A.Length - 1
                             C.L.SubItems.Add(A(i))
                         Next
                         C.L.SubItems.Add(0)
+                        F.LV1.Items.Insert(0, C.L)
                         F.LV1.AutoResizeColumns(ColumnHeaderAutoResizeStyle.HeaderSize)
                         ClinetLog(C, "Connected", Color.Green)
                     End If

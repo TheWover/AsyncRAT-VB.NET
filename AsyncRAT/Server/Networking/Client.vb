@@ -14,6 +14,7 @@ Public Class Client
     Public S As Server = Nothing
     Public IsConnected As Boolean = False
     Public BufferLength As Long = Nothing
+    Public BufferLengthReceived As Boolean = False
     Public Buffer() As Byte = Nothing
     Public MS As MemoryStream = Nothing
     Public IP As String = Nothing
@@ -26,7 +27,7 @@ Public Class Client
         C.ReceiveBufferSize = 50 * 1000
         C.SendBufferSize = 50 * 1000
         IsConnected = True
-        BufferLength = -1
+        BufferLength = 0
         Buffer = New Byte(0) {}
         MS = New MemoryStream
         IP = CL.RemoteEndPoint.ToString
@@ -35,7 +36,7 @@ Public Class Client
             isDisconnected()
             Return
         Else
-            C.BeginReceive(Buffer, 0, Buffer.Length, SocketFlags.None, New AsyncCallback(AddressOf BeginReceive), C)
+            C.BeginReceive(Buffer, 0, Buffer.Length, SocketFlags.None, New AsyncCallback(AddressOf BeginReceive), Nothing)
         End If
 
     End Sub
@@ -48,18 +49,15 @@ Public Class Client
         Try
             Dim Received As Integer = C.EndReceive(ar)
             If Received > 0 Then
-                If BufferLength = -1 Then
+                If BufferLengthReceived = False Then
                     If Buffer(0) = 0 Then
                         BufferLength = BS(MS.ToArray)
                         MS.Dispose()
                         MS = New MemoryStream
-
-                        If BufferLength = 0 Then
-                            BufferLength = -1
-                            C.BeginReceive(Buffer, 0, Buffer.Length, SocketFlags.None, New AsyncCallback(AddressOf BeginReceive), C)
-                            Exit Sub
+                        If BufferLength > 0 Then
+                            Buffer = New Byte(BufferLength - 1) {}
+                            BufferLengthReceived = True
                         End If
-                        Buffer = New Byte(BufferLength - 1) {}
                     Else
                         Await MS.WriteAsync(Buffer, 0, Buffer.Length)
                     End If
@@ -68,10 +66,11 @@ Public Class Client
                     If (MS.Length = BufferLength) Then
                         Dim ClientReq As New Incoming_Requests(Me, MS.ToArray)
                         Pending.Req_In.Add(ClientReq)
-                        BufferLength = -1
                         MS.Dispose()
                         MS = New MemoryStream
                         Buffer = New Byte(0) {}
+                        BufferLength = 0
+                        BufferLengthReceived = False
                     Else
                         Buffer = New Byte(BufferLength - MS.Length - 1) {}
                     End If
@@ -80,9 +79,9 @@ Public Class Client
                 isDisconnected()
                 Exit Sub
             End If
-            C.BeginReceive(Buffer, 0, Buffer.Length, SocketFlags.None, New AsyncCallback(AddressOf BeginReceive), C)
+            C.BeginReceive(Buffer, 0, Buffer.Length, SocketFlags.None, New AsyncCallback(AddressOf BeginReceive), Nothing)
         Catch ex As Exception
-            Debug.WriteLine("BeginReceive " + ex.Message)
+            Debug.WriteLine("Server BeginReceive " + ex.Message)
             isDisconnected()
             Exit Sub
         End Try
@@ -98,7 +97,7 @@ Public Class Client
                     Await MS.WriteAsync(b, 0, b.Length)
 
                     C.Poll(-1, SelectMode.SelectWrite)
-                    C.BeginSend(MS.ToArray, 0, MS.Length, SocketFlags.None, New AsyncCallback(AddressOf EndSend), C)
+                    C.BeginSend(MS.ToArray, 0, MS.Length, SocketFlags.None, New AsyncCallback(AddressOf EndSend), Nothing)
                 End Using
             Catch ex As Exception
                 Debug.WriteLine("BeginSend " + ex.Message)

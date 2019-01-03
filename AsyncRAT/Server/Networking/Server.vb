@@ -23,19 +23,16 @@ Public Class Server
             S.ReceiveBufferSize = 50 * 1000
             S.SendBufferSize = 50 * 1000
             S.Bind(IpEndPoint)
-            S.Listen(999)
+            S.Listen(50)
 
             While True
                 allDone.Reset()
-                S.BeginAccept(New AsyncCallback(AddressOf EndAccept), S)
+                S.BeginAccept(New AsyncCallback(AddressOf EndAccept), Nothing)
                 allDone.WaitOne()
             End While
+
         Catch ex As Exception
-            MessageBox.Show(ex.Message,
-            "Error",
-            MessageBoxButtons.OK,
-            MessageBoxIcon.Exclamation,
-            MessageBoxDefaultButton.Button1)
+            MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button1)
             Environment.Exit(0)
         End Try
     End Sub
