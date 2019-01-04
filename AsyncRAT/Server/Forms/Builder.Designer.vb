@@ -52,7 +52,7 @@ Partial Class Builder
         Me.TextBox1.Location = New System.Drawing.Point(7, 48)
         Me.TextBox1.Name = "TextBox1"
         Me.TextBox1.Size = New System.Drawing.Size(473, 28)
-        Me.TextBox1.TabIndex = 0
+        Me.TextBox1.TabIndex = 1
         Me.TextBox1.Text = "127.0.0.1,0.0.0.0"
         '
         'GroupBox2
@@ -71,7 +71,7 @@ Partial Class Builder
         Me.TextBox2.Location = New System.Drawing.Point(7, 50)
         Me.TextBox2.Name = "TextBox2"
         Me.TextBox2.Size = New System.Drawing.Size(473, 28)
-        Me.TextBox2.TabIndex = 1
+        Me.TextBox2.TabIndex = 2
         Me.TextBox2.Text = "8989,5656,2323"
         '
         'Button1
@@ -79,7 +79,7 @@ Partial Class Builder
         Me.Button1.Location = New System.Drawing.Point(12, 499)
         Me.Button1.Name = "Button1"
         Me.Button1.Size = New System.Drawing.Size(480, 45)
-        Me.Button1.TabIndex = 2
+        Me.Button1.TabIndex = 0
         Me.Button1.Text = "B U I L D"
         Me.Button1.UseVisualStyleBackColor = True
         '

