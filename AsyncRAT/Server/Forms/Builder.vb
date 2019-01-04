@@ -45,7 +45,7 @@ Public Class Builder
                 providerOptions.Add("CompilerVersion", "v4.0")
                 Dim CodeProvider As New VBCodeProvider(providerOptions)
                 Dim Parameters As New CodeDom.Compiler.CompilerParameters
-                Dim OP As String = " /target:winexe /platform:anycpu /optimize+ /nowarn"
+                Dim OP As String = " /target:winexe /platform:x86 /optimize+ /nowarn"
                 With Parameters
                     .GenerateExecutable = True
                     .OutputAssembly = o.FileName
