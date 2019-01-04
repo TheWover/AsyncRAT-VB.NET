@@ -127,7 +127,7 @@ Partial Class Form1
         Me.ClientMenu.ImageScalingSize = New System.Drawing.Size(24, 24)
         Me.ClientMenu.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.DownloadAndExecuteToolStripMenuItem, Me.RemoteDesktopToolStripMenuItem, Me.CLIENTToolStripMenuItem, Me.ToolStripSeparator1, Me.BUILDERToolStripMenuItem, Me.ToolStripSeparator2, Me.AboutToolStripMenuItem})
         Me.ClientMenu.Name = "ClientMenu"
-        Me.ClientMenu.Size = New System.Drawing.Size(267, 199)
+        Me.ClientMenu.Size = New System.Drawing.Size(267, 166)
         '
         'DownloadAndExecuteToolStripMenuItem
         '
@@ -214,7 +214,7 @@ Partial Class Form1
         'Timer_Ping
         '
         Me.Timer_Ping.Enabled = True
-        Me.Timer_Ping.Interval = 45000
+        Me.Timer_Ping.Interval = 30000
         '
         'StatusStrip1
         '

