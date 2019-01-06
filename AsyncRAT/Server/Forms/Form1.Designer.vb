@@ -81,7 +81,7 @@ Partial Class Form1
         Me.LV1.GridLines = True
         Me.LV1.Location = New System.Drawing.Point(3, 3)
         Me.LV1.Name = "LV1"
-        Me.LV1.Size = New System.Drawing.Size(1040, 324)
+        Me.LV1.Size = New System.Drawing.Size(1022, 283)
         Me.LV1.TabIndex = 0
         Me.LV1.UseCompatibleStateImageBehavior = False
         Me.LV1.View = System.Windows.Forms.View.Details
@@ -220,10 +220,10 @@ Partial Class Form1
         '
         Me.StatusStrip1.ImageScalingSize = New System.Drawing.Size(24, 24)
         Me.StatusStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripStatusLabel1})
-        Me.StatusStrip1.Location = New System.Drawing.Point(0, 361)
+        Me.StatusStrip1.Location = New System.Drawing.Point(0, 320)
         Me.StatusStrip1.Name = "StatusStrip1"
         Me.StatusStrip1.Padding = New System.Windows.Forms.Padding(1, 0, 16, 0)
-        Me.StatusStrip1.Size = New System.Drawing.Size(1054, 23)
+        Me.StatusStrip1.Size = New System.Drawing.Size(1036, 23)
         Me.StatusStrip1.TabIndex = 1
         Me.StatusStrip1.Text = "StatusStrip1"
         '
@@ -249,7 +249,7 @@ Partial Class Form1
         Me.TabControl1.Location = New System.Drawing.Point(0, 0)
         Me.TabControl1.Name = "TabControl1"
         Me.TabControl1.SelectedIndex = 0
-        Me.TabControl1.Size = New System.Drawing.Size(1054, 361)
+        Me.TabControl1.Size = New System.Drawing.Size(1036, 320)
         Me.TabControl1.TabIndex = 2
         '
         'TabPage1
@@ -259,7 +259,7 @@ Partial Class Form1
         Me.TabPage1.Location = New System.Drawing.Point(4, 27)
         Me.TabPage1.Name = "TabPage1"
         Me.TabPage1.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage1.Size = New System.Drawing.Size(1046, 330)
+        Me.TabPage1.Size = New System.Drawing.Size(1028, 289)
         Me.TabPage1.TabIndex = 0
         Me.TabPage1.Text = "Clients List"
         Me.TabPage1.UseVisualStyleBackColor = True
@@ -354,7 +354,7 @@ Partial Class Form1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(10.0!, 18.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1054, 384)
+        Me.ClientSize = New System.Drawing.Size(1036, 343)
         Me.Controls.Add(Me.TabControl1)
         Me.Controls.Add(Me.StatusStrip1)
         Me.Font = New System.Drawing.Font("Verdana", 8.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
