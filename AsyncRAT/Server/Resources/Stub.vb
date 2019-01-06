@@ -67,9 +67,10 @@ Namespace AsyncRAT_Stub
 
 #End If
 
-        Public Shared ReadOnly VER As String = "v1.6"
+        Public Shared ReadOnly VER As String = "v1.7"
         Public Shared ReadOnly SPL As String = "<<Async|RAT>>"
     End Class
+
 
 
     Public Class Program
