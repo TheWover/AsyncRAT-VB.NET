@@ -10,44 +10,45 @@ Imports System.Net.Sockets
 
 Public Class Client
 
-    Public C As Socket = Nothing
-    Public S As Server = Nothing
+    Public ClientSocket As Socket = Nothing
+    Public ServerSocket As Server = Nothing
     Public IsConnected As Boolean = False
     Public BufferLength As Long = Nothing
     Public BufferLengthReceived As Boolean = False
     Public Buffer() As Byte = Nothing
     Public MS As MemoryStream = Nothing
     Public IP As String = Nothing
-    Public L As ListViewItem = Nothing
+    Public LV As ListViewItem = Nothing
 
     Sub New(ByVal CL As Socket, SR As Server)
 
-        C = CL
-        S = SR
-        C.ReceiveBufferSize = 50 * 1000
-        C.SendBufferSize = 50 * 1000
+        ClientSocket = CL
+        ServerSocket = SR
+        ClientSocket.ReceiveBufferSize = 50 * 1000
+        ClientSocket.SendBufferSize = 50 * 1000
         IsConnected = True
         BufferLength = 0
         Buffer = New Byte(0) {}
         MS = New MemoryStream
         IP = CL.RemoteEndPoint.ToString
 
-        If S.Blocked.Contains(IP.Split(":")(0)) Then
+        If ServerSocket.Blocked.Contains(IP.Split(":")(0)) Then
             isDisconnected()
             Return
         Else
-            C.BeginReceive(Buffer, 0, Buffer.Length, SocketFlags.None, New AsyncCallback(AddressOf BeginReceive), Nothing)
+            Settings.Online.Add(Me)
+            ClientSocket.BeginReceive(Buffer, 0, Buffer.Length, SocketFlags.None, New AsyncCallback(AddressOf BeginReceive), Nothing)
         End If
 
     End Sub
 
     Async Sub BeginReceive(ByVal ar As IAsyncResult)
-        If IsConnected = False OrElse Not C.Connected Then
+        If IsConnected = False OrElse Not ClientSocket.Connected Then
             isDisconnected()
             Exit Sub
         End If
         Try
-            Dim Received As Integer = C.EndReceive(ar)
+            Dim Received As Integer = ClientSocket.EndReceive(ar)
             If Received > 0 Then
                 If BufferLengthReceived = False Then
                     If Buffer(0) = 0 Then
@@ -79,7 +80,7 @@ Public Class Client
                 isDisconnected()
                 Exit Sub
             End If
-            C.BeginReceive(Buffer, 0, Buffer.Length, SocketFlags.None, New AsyncCallback(AddressOf BeginReceive), Nothing)
+            ClientSocket.BeginReceive(Buffer, 0, Buffer.Length, SocketFlags.None, New AsyncCallback(AddressOf BeginReceive), Nothing)
         Catch ex As Exception
             Debug.WriteLine("Server BeginReceive " + ex.Message)
             isDisconnected()
@@ -87,17 +88,20 @@ Public Class Client
         End Try
     End Sub
 
-    Async Sub BeginSend(ByVal Data As Byte())
-        If IsConnected OrElse C.Connected Then
+    Async Sub BeginSend(ParamArray Msgs As Object())
+        If IsConnected OrElse ClientSocket.Connected Then
             Try
+                Dim Packer As New Pack
+                Dim Data As Byte() = Packer.Serialize(Msgs)
+
                 Using MS As New MemoryStream
                     Dim b As Byte() = AES_Encryptor(Data)
                     Dim L As Byte() = SB(b.Length & CChar(vbNullChar))
                     Await MS.WriteAsync(L, 0, L.Length)
                     Await MS.WriteAsync(b, 0, b.Length)
 
-                    C.Poll(-1, SelectMode.SelectWrite)
-                    C.BeginSend(MS.ToArray, 0, MS.Length, SocketFlags.None, New AsyncCallback(AddressOf EndSend), Nothing)
+                    ClientSocket.Poll(-1, SelectMode.SelectWrite)
+                    ClientSocket.BeginSend(MS.ToArray, 0, MS.Length, SocketFlags.None, New AsyncCallback(AddressOf EndSend), Nothing)
                 End Using
             Catch ex As Exception
                 Debug.WriteLine("BeginSend " + ex.Message)
@@ -108,7 +112,7 @@ Public Class Client
 
     Sub EndSend(ByVal ar As IAsyncResult)
         Try
-            C.EndSend(ar)
+            ClientSocket.EndSend(ar)
         Catch ex As Exception
             Debug.WriteLine("EndSend " + ex.Message)
             isDisconnected()
@@ -119,14 +123,15 @@ Public Class Client
     Sub isDisconnected()
 
         IsConnected = False
+        Settings.Online.Remove(Me)
 
         Try
-            If L IsNot Nothing Then
+            If LV IsNot Nothing Then
                 If Messages.F.InvokeRequired Then
                     Messages.F.Invoke(New _isDisconnected(AddressOf isDisconnected))
                     Exit Sub
                 Else
-                    L.Remove()
+                    LV.Remove()
                     Messages.ClinetLog(Me, "Disconnected", Color.Red)
                 End If
             End If
@@ -135,8 +140,8 @@ Public Class Client
         End Try
 
         Try
-            C.Close()
-            C.Dispose()
+            ClientSocket.Close()
+            ClientSocket.Dispose()
         Catch ex As Exception
             Debug.WriteLine("C.Close " + ex.Message)
         End Try

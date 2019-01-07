@@ -80,6 +80,7 @@ Partial Class TaskForm
         Me.MinimizeBox = False
         Me.Name = "TaskForm"
         Me.ShowInTaskbar = False
+        Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent
         Me.Text = " TaskForm"
         Me.ResumeLayout(False)
         Me.PerformLayout()

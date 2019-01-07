@@ -81,7 +81,7 @@ Partial Class Form1
         Me.LV1.GridLines = True
         Me.LV1.Location = New System.Drawing.Point(3, 3)
         Me.LV1.Name = "LV1"
-        Me.LV1.Size = New System.Drawing.Size(1022, 283)
+        Me.LV1.Size = New System.Drawing.Size(1022, 300)
         Me.LV1.TabIndex = 0
         Me.LV1.UseCompatibleStateImageBehavior = False
         Me.LV1.View = System.Windows.Forms.View.Details
@@ -220,7 +220,7 @@ Partial Class Form1
         '
         Me.StatusStrip1.ImageScalingSize = New System.Drawing.Size(24, 24)
         Me.StatusStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripStatusLabel1})
-        Me.StatusStrip1.Location = New System.Drawing.Point(0, 320)
+        Me.StatusStrip1.Location = New System.Drawing.Point(0, 337)
         Me.StatusStrip1.Name = "StatusStrip1"
         Me.StatusStrip1.Padding = New System.Windows.Forms.Padding(1, 0, 16, 0)
         Me.StatusStrip1.Size = New System.Drawing.Size(1036, 23)
@@ -249,7 +249,7 @@ Partial Class Form1
         Me.TabControl1.Location = New System.Drawing.Point(0, 0)
         Me.TabControl1.Name = "TabControl1"
         Me.TabControl1.SelectedIndex = 0
-        Me.TabControl1.Size = New System.Drawing.Size(1036, 320)
+        Me.TabControl1.Size = New System.Drawing.Size(1036, 337)
         Me.TabControl1.TabIndex = 2
         '
         'TabPage1
@@ -259,7 +259,7 @@ Partial Class Form1
         Me.TabPage1.Location = New System.Drawing.Point(4, 27)
         Me.TabPage1.Name = "TabPage1"
         Me.TabPage1.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage1.Size = New System.Drawing.Size(1028, 289)
+        Me.TabPage1.Size = New System.Drawing.Size(1028, 306)
         Me.TabPage1.TabIndex = 0
         Me.TabPage1.Text = "Clients List"
         Me.TabPage1.UseVisualStyleBackColor = True
@@ -270,7 +270,7 @@ Partial Class Form1
         Me.TabPage3.Location = New System.Drawing.Point(4, 27)
         Me.TabPage3.Name = "TabPage3"
         Me.TabPage3.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage3.Size = New System.Drawing.Size(1046, 330)
+        Me.TabPage3.Size = New System.Drawing.Size(1028, 306)
         Me.TabPage3.TabIndex = 2
         Me.TabPage3.Text = "Logs"
         Me.TabPage3.UseVisualStyleBackColor = True
@@ -284,7 +284,7 @@ Partial Class Form1
         Me.LV2.Location = New System.Drawing.Point(3, 3)
         Me.LV2.MultiSelect = False
         Me.LV2.Name = "LV2"
-        Me.LV2.Size = New System.Drawing.Size(1040, 324)
+        Me.LV2.Size = New System.Drawing.Size(1022, 300)
         Me.LV2.TabIndex = 0
         Me.LV2.UseCompatibleStateImageBehavior = False
         Me.LV2.View = System.Windows.Forms.View.List
@@ -295,7 +295,7 @@ Partial Class Form1
         Me.TabPage2.Location = New System.Drawing.Point(4, 27)
         Me.TabPage2.Name = "TabPage2"
         Me.TabPage2.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage2.Size = New System.Drawing.Size(1046, 330)
+        Me.TabPage2.Size = New System.Drawing.Size(1028, 306)
         Me.TabPage2.TabIndex = 1
         Me.TabPage2.Text = "Tasks List"
         Me.TabPage2.UseVisualStyleBackColor = True
@@ -311,7 +311,7 @@ Partial Class Form1
         Me.LV3.GridLines = True
         Me.LV3.Location = New System.Drawing.Point(3, 3)
         Me.LV3.Name = "LV3"
-        Me.LV3.Size = New System.Drawing.Size(1040, 324)
+        Me.LV3.Size = New System.Drawing.Size(1022, 300)
         Me.LV3.TabIndex = 0
         Me.LV3.UseCompatibleStateImageBehavior = False
         Me.LV3.View = System.Windows.Forms.View.Details
@@ -354,12 +354,11 @@ Partial Class Form1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(10.0!, 18.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1036, 343)
+        Me.ClientSize = New System.Drawing.Size(1036, 360)
         Me.Controls.Add(Me.TabControl1)
         Me.Controls.Add(Me.StatusStrip1)
         Me.Font = New System.Drawing.Font("Verdana", 8.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
-        Me.MinimumSize = New System.Drawing.Size(1058, 344)
         Me.Name = "Form1"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen
         Me.Text = " AsyncRAT"

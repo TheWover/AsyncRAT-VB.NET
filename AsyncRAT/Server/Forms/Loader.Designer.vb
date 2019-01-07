@@ -43,7 +43,7 @@ Partial Class Loader
         '
         'Button1
         '
-        Me.Button1.Location = New System.Drawing.Point(120, 125)
+        Me.Button1.Location = New System.Drawing.Point(131, 125)
         Me.Button1.Name = "Button1"
         Me.Button1.Size = New System.Drawing.Size(248, 37)
         Me.Button1.TabIndex = 6
@@ -64,7 +64,7 @@ Partial Class Loader
         Me.ComboBox1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.ComboBox1.FormattingEnabled = True
         Me.ComboBox1.Items.AddRange(New Object() {"RunPE", ".NET EntryPoint"})
-        Me.ComboBox1.Location = New System.Drawing.Point(120, 16)
+        Me.ComboBox1.Location = New System.Drawing.Point(131, 16)
         Me.ComboBox1.Name = "ComboBox1"
         Me.ComboBox1.Size = New System.Drawing.Size(248, 28)
         Me.ComboBox1.TabIndex = 4
@@ -84,7 +84,7 @@ Partial Class Loader
         Me.ComboBox2.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.ComboBox2.FormattingEnabled = True
         Me.ComboBox2.Items.AddRange(New Object() {"MSBuild.exe", "RegAsm.exe", "RegSvcs.exe", "vbc.exe"})
-        Me.ComboBox2.Location = New System.Drawing.Point(120, 60)
+        Me.ComboBox2.Location = New System.Drawing.Point(131, 60)
         Me.ComboBox2.Name = "ComboBox2"
         Me.ComboBox2.Size = New System.Drawing.Size(248, 28)
         Me.ComboBox2.TabIndex = 8
@@ -93,7 +93,7 @@ Partial Class Loader
         'Label3
         '
         Me.Label3.AutoSize = True
-        Me.Label3.Location = New System.Drawing.Point(136, 198)
+        Me.Label3.Location = New System.Drawing.Point(147, 198)
         Me.Label3.Name = "Label3"
         Me.Label3.Size = New System.Drawing.Size(0, 20)
         Me.Label3.TabIndex = 10

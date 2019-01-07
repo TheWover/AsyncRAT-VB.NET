@@ -23,7 +23,7 @@ Public Class Server
             S.ReceiveBufferSize = 50 * 1000
             S.SendBufferSize = 50 * 1000
             S.Bind(IpEndPoint)
-            S.Listen(50)
+            S.Listen(20)
 
             While True
                 allDone.Reset()

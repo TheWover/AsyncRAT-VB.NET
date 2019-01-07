@@ -20,9 +20,9 @@ End Class
 
 Public Class Outcoming_Requests
     Public C As Client
-    Public B As Byte()
+    Public B As Object()
 
-    Sub New(ByVal C_ As Client, B_ As Byte())
+    Sub New(ByVal C_ As Client, ParamArray B_ As Object())
         C = C_
         B = B_
     End Sub

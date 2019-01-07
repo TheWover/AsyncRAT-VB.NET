@@ -3,11 +3,11 @@
 Module Helper
 
     Function SB(ByVal s As String) As Byte()
-        Return Text.Encoding.Default.GetBytes(s)
+        Return Text.Encoding.UTF8.GetBytes(s)
     End Function
 
     Function BS(ByVal b As Byte()) As String
-        Return Text.Encoding.Default.GetString(b)
+        Return Text.Encoding.UTF8.GetString(b)
     End Function
 
     Function _Size(ByVal Size As String) As String
@@ -61,8 +61,8 @@ Module Helper
         Catch ex As Exception
             Debug.WriteLine("AES_Decryptor" + ex.Message)
             If C.IsConnected Then
-                If Not C.S.Blocked.Contains(C.IP.ToString.Split(":")(0)) Then
-                    C.S.Blocked.Add(C.IP.ToString.Split(":")(0))
+                If Not C.ServerSocket.Blocked.Contains(C.IP.ToString.Split(":")(0)) Then
+                    C.ServerSocket.Blocked.Add(C.IP.ToString.Split(":")(0))
                     Messages.ClinetLog(C, "Blocked invalid KEY", Color.Red)
                     Debug.WriteLine("Blocked " + C.IP.Split(":")(0))
                     C.isDisconnected()
