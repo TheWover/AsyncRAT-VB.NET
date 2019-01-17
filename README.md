@@ -5,7 +5,9 @@
 	
 ***Remote Administration Tool For Windows***
  ```
-This project is for learing, If you find any bug please contact me.
+This project is for learing and It's not ready to be used.
+AsyncRAT is all about learning tcp socket but I added features just to test the stability.
+If you found a bug or a better way to code the socket please contact me
  ```
 
 ---
@@ -18,7 +20,6 @@ This project is for learing, If you find any bug please contact me.
 - **Multi-Hosts**
 - **Multi-Ports**
 - **Multi-Clients**
-- **Encrypted Traffic**
 
 
 ---
