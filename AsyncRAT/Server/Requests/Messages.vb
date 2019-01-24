@@ -6,7 +6,7 @@
 
     Public Shared Sub Read(ByVal CurrentClient As Client, ByVal Data() As Byte)
         If F.InvokeRequired Then
-            F.Invoke(New _Read(AddressOf Read), New Object() {CurrentClient, Data})
+            F.BeginInvoke(New _Read(AddressOf Read), New Object() {CurrentClient, Data})
             Exit Sub
         Else
             Try
@@ -78,7 +78,7 @@
 
     Delegate Sub _ClinetLog(ByVal CL As Client, ByVal Msg As String, ByVal Color As Color)
     Public Shared Sub ClinetLog(ByVal CL As Client, ByVal Msg As String, ByVal Color As Color)
-        If F.InvokeRequired Then : F.Invoke(New _ClinetLog(AddressOf ClinetLog), New Object() {CL, Msg, Color}) : Exit Sub : Else
+        If F.InvokeRequired Then : F.BeginInvoke(New _ClinetLog(AddressOf ClinetLog), New Object() {CL, Msg, Color}) : Exit Sub : Else
             If CL IsNot Nothing Then
                 Dim lvi As ListViewItem = New ListViewItem()
                 lvi.Text = String.Format("{0} -> {1} -> {2}", DateTime.Now.ToShortTimeString, CL.IP.Split(":")(0) + ":" + CL.ClientSocket.LocalEndPoint.ToString.Split(":")(1), Msg)

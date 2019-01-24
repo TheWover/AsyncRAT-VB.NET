@@ -128,7 +128,7 @@ Public Class Client
         Try
             If LV IsNot Nothing Then
                 If Messages.F.InvokeRequired Then
-                    Messages.F.Invoke(New _isDisconnected(AddressOf isDisconnected))
+                    Messages.F.BeginInvoke(New _isDisconnected(AddressOf isDisconnected))
                     Exit Sub
                 Else
                     LV.Remove()
