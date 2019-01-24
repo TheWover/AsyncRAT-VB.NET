@@ -63,6 +63,11 @@
                         CurrentClient.LV.ForeColor = Nothing
                         Exit Select
 
+
+                    Case PacketHeader.Ping
+                        Debug.WriteLine("Client just pinged me!")
+                        Exit Select
+
                 End Select
             Catch ex As Exception
                 Debug.WriteLine("Messages " + ex.Message)
