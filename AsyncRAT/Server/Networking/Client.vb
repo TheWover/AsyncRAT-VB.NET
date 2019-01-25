@@ -20,10 +20,9 @@ Public Class Client
     Public IP As String = Nothing
     Public LV As ListViewItem = Nothing
 
-    Sub New(ByVal CL As Socket, SR As Server)
+    Sub New(ByVal CL As Socket)
 
         ClientSocket = CL
-        ServerSocket = SR
         ClientSocket.ReceiveBufferSize = 50 * 1000
         ClientSocket.SendBufferSize = 50 * 1000
         IsConnected = True
@@ -32,7 +31,7 @@ Public Class Client
         MS = New MemoryStream
         IP = CL.RemoteEndPoint.ToString
 
-        If ServerSocket.Blocked.Contains(IP.Split(":")(0)) Then
+        If Settings.Blocked.Contains(IP.Split(":")(0)) Then
             isDisconnected()
             Return
         Else
@@ -76,15 +75,13 @@ Public Class Client
                         Buffer = New Byte(BufferLength - MS.Length - 1) {}
                     End If
                 End If
+                ClientSocket.BeginReceive(Buffer, 0, Buffer.Length, SocketFlags.None, New AsyncCallback(AddressOf BeginReceive), Nothing)
             Else
                 isDisconnected()
-                Exit Sub
             End If
-            ClientSocket.BeginReceive(Buffer, 0, Buffer.Length, SocketFlags.None, New AsyncCallback(AddressOf BeginReceive), Nothing)
         Catch ex As Exception
             Debug.WriteLine("Server BeginReceive " + ex.Message)
             isDisconnected()
-            Exit Sub
         End Try
     End Sub
 

@@ -10,12 +10,10 @@ Imports System.Net
 
 Public Class Server
     Public S As Socket
-    Public Blocked As List(Of String)
     Public allDone As New Threading.ManualResetEvent(False)
 
     Sub Start(ByVal Port As Integer)
         Try
-            Blocked = New List(Of String)
 
             S = New Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp)
             Dim IpEndPoint As IPEndPoint = New IPEndPoint(IPAddress.Any, Port)
@@ -39,7 +37,7 @@ Public Class Server
 
     Sub EndAccept(ByVal ar As IAsyncResult)
         Try
-            Dim C As Client = New Client(S.EndAccept(ar), Me)
+            Dim C As Client = New Client(S.EndAccept(ar))
         Catch ex As Exception
             Debug.WriteLine("EndAccept " + ex.Message)
         Finally
