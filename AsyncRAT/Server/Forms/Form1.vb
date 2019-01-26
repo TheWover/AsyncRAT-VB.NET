@@ -53,7 +53,6 @@ Public Class Form1
                 Environment.Exit(0)
             End If
 
-            Try : LV1.AutoResizeColumns(ColumnHeaderAutoResizeStyle.HeaderSize) : Catch : End Try
         Catch ex As Exception
             Debug.WriteLine("PORTS INTRO " + ex.Message)
         End Try

@@ -89,22 +89,22 @@ Partial Class Form1
         '_IP
         '
         Me._IP.Text = "IP"
-        Me._IP.Width = 101
+        Me._IP.Width = 150
         '
         '_COUNTRY
         '
         Me._COUNTRY.Text = "Country"
-        Me._COUNTRY.Width = 111
+        Me._COUNTRY.Width = 150
         '
         '_ID
         '
         Me._ID.Text = "ID"
-        Me._ID.Width = 154
+        Me._ID.Width = 150
         '
         '_Username
         '
         Me._Username.Text = "Username"
-        Me._Username.Width = 159
+        Me._Username.Width = 150
         '
         '_OS
         '
@@ -114,12 +114,12 @@ Partial Class Form1
         '_VER
         '
         Me._VER.Text = "Version"
-        Me._VER.Width = 148
+        Me._VER.Width = 150
         '
         '_TASKS
         '
         Me._TASKS.Text = "Last Task"
-        Me._TASKS.Width = 103
+        Me._TASKS.Width = 100
         '
         'ClientMenu
         '

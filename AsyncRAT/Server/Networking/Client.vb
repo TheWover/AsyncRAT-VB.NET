@@ -35,7 +35,6 @@ Public Class Client
             isDisconnected()
             Return
         Else
-            Settings.Online.Add(Me)
             ClientSocket.BeginReceive(Buffer, 0, Buffer.Length, SocketFlags.None, New AsyncCallback(AddressOf BeginReceive), Nothing)
         End If
 
@@ -124,8 +123,8 @@ Public Class Client
 
         Try
             If LV IsNot Nothing Then
-                If Messages.F.InvokeRequired Then
-                    Messages.F.BeginInvoke(New _isDisconnected(AddressOf isDisconnected))
+                If Messages.F.LV1.InvokeRequired Then
+                    Messages.F.LV1.BeginInvoke(New _isDisconnected(AddressOf isDisconnected))
                     Exit Sub
                 Else
                     LV.Remove()
