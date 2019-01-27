@@ -19,6 +19,7 @@ Public Class Client
     Public MS As MemoryStream = Nothing
     Public IP As String = Nothing
     Public LV As ListViewItem = Nothing
+    Public SendSync As Object = Nothing
 
     Sub New(ByVal CL As Socket)
 
@@ -30,7 +31,7 @@ Public Class Client
         Buffer = New Byte(0) {}
         MS = New MemoryStream
         IP = CL.RemoteEndPoint.ToString
-
+        SendSync = New Object()
         If Settings.Blocked.Contains(IP.Split(":")(0)) Then
             isDisconnected()
             Return
@@ -85,8 +86,7 @@ Public Class Client
     End Sub
 
     Sub BeginSend(ParamArray Msgs As Object())
-        Dim Client As Client = Me
-        SyncLock Client
+        SyncLock SendSync
             If IsConnected OrElse ClientSocket.Connected Then
                 Try
                     Dim Packer As New Pack

