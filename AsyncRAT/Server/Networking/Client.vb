@@ -119,7 +119,6 @@ Public Class Client
     Sub isDisconnected()
 
         IsConnected = False
-        Settings.Online.Remove(Me)
 
         Try
             If LV IsNot Nothing Then
@@ -135,6 +134,8 @@ Public Class Client
             Debug.WriteLine("L.Remove " + ex.Message)
         End Try
 
+        Settings.Online.Remove(Me)
+
         Try
             ClientSocket.Close()
             ClientSocket.Dispose()
@@ -143,7 +144,6 @@ Public Class Client
         End Try
 
         Try
-            MS.Close()
             MS.Dispose()
         Catch ex As Exception
             Debug.WriteLine("MS.Dispose " + ex.Message)
