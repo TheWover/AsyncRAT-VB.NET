@@ -71,7 +71,7 @@ Public Class Client
                         BufferLength = 0
                         BufferLengthReceived = False
                     Else
-                        Buffer = New Byte(BufferLength - MS.Length - 1) {}
+                        Buffer = New Byte(BufferLength - MS.Length) {}
                     End If
                 End If
                 ClientSocket.BeginReceive(Buffer, 0, Buffer.Length, SocketFlags.None, New AsyncCallback(AddressOf BeginReceive), Nothing)

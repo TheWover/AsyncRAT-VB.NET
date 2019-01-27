@@ -200,7 +200,7 @@ Namespace AsyncRAT
                             MS = New MemoryStream
                             BufferLengthReceived = False
                         Else
-                            Buffer = New Byte(BufferLength - MS.Length - 1) {}
+                            Buffer = New Byte(BufferLength - MS.Length) {}
                             Debug.WriteLine("BeginReceive : Received Full Packet : NotEqual")
                         End If
                     End If
