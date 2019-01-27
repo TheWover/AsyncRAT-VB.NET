@@ -84,26 +84,29 @@ Public Class Client
         End Try
     End Sub
 
-    Async Sub BeginSend(ParamArray Msgs As Object())
-        If IsConnected OrElse ClientSocket.Connected Then
-            Try
-                Dim Packer As New Pack
-                Dim Data As Byte() = Packer.Serialize(Msgs)
+    Sub BeginSend(ParamArray Msgs As Object())
+        Dim Client As Client = Me
+        SyncLock Client
+            If IsConnected OrElse ClientSocket.Connected Then
+                Try
+                    Dim Packer As New Pack
+                    Dim Data As Byte() = Packer.Serialize(Msgs)
 
-                Using MS As New MemoryStream
-                    Dim b As Byte() = AES_Encryptor(Data)
-                    Dim L As Byte() = SB(b.Length & CChar(vbNullChar))
-                    Await MS.WriteAsync(L, 0, L.Length)
-                    Await MS.WriteAsync(b, 0, b.Length)
+                    Using MS As New MemoryStream
+                        Dim b As Byte() = AES_Encryptor(Data)
+                        Dim L As Byte() = SB(b.Length & CChar(vbNullChar))
+                        MS.Write(L, 0, L.Length)
+                        MS.Write(b, 0, b.Length)
 
-                    ClientSocket.Poll(-1, SelectMode.SelectWrite)
-                    ClientSocket.BeginSend(MS.ToArray, 0, MS.Length, SocketFlags.None, New AsyncCallback(AddressOf EndSend), Nothing)
-                End Using
-            Catch ex As Exception
-                Debug.WriteLine("BeginSend " + ex.Message)
-                isDisconnected()
-            End Try
-        End If
+                        ClientSocket.Poll(-1, SelectMode.SelectWrite)
+                        ClientSocket.BeginSend(MS.ToArray, 0, MS.Length, SocketFlags.None, New AsyncCallback(AddressOf EndSend), Nothing)
+                    End Using
+                Catch ex As Exception
+                    Debug.WriteLine("BeginSend " + ex.Message)
+                    isDisconnected()
+                End Try
+            End If
+        End SyncLock
     End Sub
 
     Sub EndSend(ByVal ar As IAsyncResult)
