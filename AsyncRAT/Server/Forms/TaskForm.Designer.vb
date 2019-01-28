@@ -34,7 +34,7 @@ Partial Class TaskForm
         Me.ComboBox1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.ComboBox1.FormattingEnabled = True
         Me.ComboBox1.Items.AddRange(New Object() {"Update Client", "Download And Execute"})
-        Me.ComboBox1.Location = New System.Drawing.Point(124, 27)
+        Me.ComboBox1.Location = New System.Drawing.Point(131, 27)
         Me.ComboBox1.Name = "ComboBox1"
         Me.ComboBox1.Size = New System.Drawing.Size(248, 28)
         Me.ComboBox1.TabIndex = 0
@@ -50,7 +50,7 @@ Partial Class TaskForm
         '
         'Button1
         '
-        Me.Button1.Location = New System.Drawing.Point(124, 67)
+        Me.Button1.Location = New System.Drawing.Point(131, 67)
         Me.Button1.Name = "Button1"
         Me.Button1.Size = New System.Drawing.Size(248, 37)
         Me.Button1.TabIndex = 2

@@ -25,11 +25,11 @@
             Try
                 Reflection.Assembly.LoadFile(o.FileName)
                 isOK = True
-                Label3.Text = IO.Path.GetFileName(o.FileName)
+                ToolStripStatusLabel1.Text = IO.Path.GetFileName(o.FileName)
             Catch ex As Exception
                 isOK = False
                 MsgBox(IO.Path.GetFileName(o.FileName) + " is not a managed file.", MsgBoxStyle.Exclamation)
-                Label3.Text = ""
+                ToolStripStatusLabel1.Text = ""
             End Try
         End If
     End Sub

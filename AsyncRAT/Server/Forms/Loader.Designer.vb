@@ -29,7 +29,9 @@ Partial Class Loader
         Me.ComboBox1 = New System.Windows.Forms.ComboBox()
         Me.Label2 = New System.Windows.Forms.Label()
         Me.ComboBox2 = New System.Windows.Forms.ComboBox()
-        Me.Label3 = New System.Windows.Forms.Label()
+        Me.StatusStrip1 = New System.Windows.Forms.StatusStrip()
+        Me.ToolStripStatusLabel1 = New System.Windows.Forms.ToolStripStatusLabel()
+        Me.StatusStrip1.SuspendLayout()
         Me.SuspendLayout()
         '
         'Button2
@@ -43,7 +45,7 @@ Partial Class Loader
         '
         'Button1
         '
-        Me.Button1.Location = New System.Drawing.Point(131, 125)
+        Me.Button1.Location = New System.Drawing.Point(135, 125)
         Me.Button1.Name = "Button1"
         Me.Button1.Size = New System.Drawing.Size(248, 37)
         Me.Button1.TabIndex = 6
@@ -64,7 +66,7 @@ Partial Class Loader
         Me.ComboBox1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.ComboBox1.FormattingEnabled = True
         Me.ComboBox1.Items.AddRange(New Object() {"RunPE", ".NET EntryPoint"})
-        Me.ComboBox1.Location = New System.Drawing.Point(131, 16)
+        Me.ComboBox1.Location = New System.Drawing.Point(135, 16)
         Me.ComboBox1.Name = "ComboBox1"
         Me.ComboBox1.Size = New System.Drawing.Size(248, 28)
         Me.ComboBox1.TabIndex = 4
@@ -84,26 +86,34 @@ Partial Class Loader
         Me.ComboBox2.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList
         Me.ComboBox2.FormattingEnabled = True
         Me.ComboBox2.Items.AddRange(New Object() {"MSBuild.exe", "RegAsm.exe", "RegSvcs.exe", "vbc.exe"})
-        Me.ComboBox2.Location = New System.Drawing.Point(131, 60)
+        Me.ComboBox2.Location = New System.Drawing.Point(135, 60)
         Me.ComboBox2.Name = "ComboBox2"
         Me.ComboBox2.Size = New System.Drawing.Size(248, 28)
         Me.ComboBox2.TabIndex = 8
         Me.ComboBox2.Visible = False
         '
-        'Label3
+        'StatusStrip1
         '
-        Me.Label3.AutoSize = True
-        Me.Label3.Location = New System.Drawing.Point(147, 198)
-        Me.Label3.Name = "Label3"
-        Me.Label3.Size = New System.Drawing.Size(0, 20)
-        Me.Label3.TabIndex = 10
+        Me.StatusStrip1.ImageScalingSize = New System.Drawing.Size(24, 24)
+        Me.StatusStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.ToolStripStatusLabel1})
+        Me.StatusStrip1.Location = New System.Drawing.Point(0, 256)
+        Me.StatusStrip1.Name = "StatusStrip1"
+        Me.StatusStrip1.Size = New System.Drawing.Size(433, 30)
+        Me.StatusStrip1.TabIndex = 10
+        Me.StatusStrip1.Text = "StatusStrip1"
+        '
+        'ToolStripStatusLabel1
+        '
+        Me.ToolStripStatusLabel1.Name = "ToolStripStatusLabel1"
+        Me.ToolStripStatusLabel1.Size = New System.Drawing.Size(24, 25)
+        Me.ToolStripStatusLabel1.Text = "..."
         '
         'Loader
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(9.0!, 20.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(433, 253)
-        Me.Controls.Add(Me.Label3)
+        Me.ClientSize = New System.Drawing.Size(433, 286)
+        Me.Controls.Add(Me.StatusStrip1)
         Me.Controls.Add(Me.Label2)
         Me.Controls.Add(Me.ComboBox2)
         Me.Controls.Add(Me.Button2)
@@ -116,6 +126,8 @@ Partial Class Loader
         Me.Name = "Loader"
         Me.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent
         Me.Text = "AsyncRAT | Lime Loader"
+        Me.StatusStrip1.ResumeLayout(False)
+        Me.StatusStrip1.PerformLayout()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -127,5 +139,6 @@ Partial Class Loader
     Friend WithEvents ComboBox1 As ComboBox
     Friend WithEvents Label2 As Label
     Friend WithEvents ComboBox2 As ComboBox
-    Friend WithEvents Label3 As Label
+    Friend WithEvents StatusStrip1 As StatusStrip
+    Friend WithEvents ToolStripStatusLabel1 As ToolStripStatusLabel
 End Class
