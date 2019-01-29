@@ -39,12 +39,12 @@
                         If CurrentClient.LV.ForeColor = Color.Red Then
                             CurrentClient.LV.ForeColor = Color.Empty
                         End If
-                        Dim RD As RemoteDesktop = My.Application.OpenForms("RD" + CurrentClient.IP)
+                        Dim RD As RemoteDesktop = My.Application.OpenForms("RD" + CurrentClient.ID)
                         If RD Is Nothing Then
                             RD = New RemoteDesktop With {
                             .F = F,
                             .C = CurrentClient,
-                            .Name = "RD" + CurrentClient.IP,
+                            .Name = "RD" + CurrentClient.ID,
                             .Text = " Remote Desktop " + CurrentClient.IP.Split(":")(0)
                         }
                             RD.Show()
@@ -57,7 +57,7 @@
                         F.BeginInvoke(New _Read(AddressOf Read), New Object() {CurrentClient, Data})
                         Exit Sub
                     Else
-                        Dim RD As RemoteDesktop = My.Application.OpenForms("RD" + CurrentClient.IP)
+                        Dim RD As RemoteDesktop = My.Application.OpenForms("RD" + CurrentClient.ID)
                         If RD IsNot Nothing Then
                             RD.Text = " Remote Desktop " + CurrentClient.IP.Split(":")(0) + " [" + _Size(itm(1).LongLength) + "]"
                             Using MS As IO.MemoryStream = New IO.MemoryStream(DirectCast(itm(1), Byte()))

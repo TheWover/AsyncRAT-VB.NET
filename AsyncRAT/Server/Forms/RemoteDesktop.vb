@@ -6,7 +6,13 @@ Public Class RemoteDesktop
     Public isOK As Boolean = False
     Private Async Sub RemoteDesktop_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         Await Task.Delay(250)
-        Button1.PerformClick()
+        If Button1.Text = "OFF" Then
+            Button1.Text = "Capturing..."
+            Dim ClientReq As New Outcoming_Requests(C, CByte(PacketHeader.RemoteDesktopSend), Me.Width, Me.Height)
+            Pending.Req_Out.Add(ClientReq)
+        Else
+            Button1.Text = "OFF"
+        End If
     End Sub
 
     Private Sub Button1_Click(sender As Object, e As EventArgs) Handles Button1.Click
