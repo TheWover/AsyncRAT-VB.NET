@@ -23,7 +23,6 @@
                         For i As Integer = 1 To itm.Length - 1
                             CurrentClient.LV.SubItems.Add(itm(i))
                         Next
-                        CurrentClient.LV.SubItems.Add(0)
                         F.LV1.Items.Insert(0, CurrentClient.LV)
                         ClinetLog(CurrentClient, "Connected", Color.Green)
                         Settings.Online.Add(CurrentClient)

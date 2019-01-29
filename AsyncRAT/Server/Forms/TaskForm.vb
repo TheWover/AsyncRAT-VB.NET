@@ -5,8 +5,7 @@ Public Class TaskForm
     Public _FILE As String = Nothing
     Public _CMD As String = Nothing
     Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click
-        If ComboBox1.Text.Length > 0 AndAlso Button1.Text <> "Select File" Then
-            OK = True
+        If OK = True Then
             Me.Hide()
         End If
     End Sub
@@ -22,9 +21,11 @@ Public Class TaskForm
 
             If o.ShowDialog = Windows.Forms.DialogResult.OK Then
                 _FILE = o.FileName
-                Button1.Text = Path.GetFileName(o.FileName)
+                ToolStripStatusLabel1.Text = Path.GetFileName(o.FileName)
+                OK = True
             End If
         Catch ex As Exception
+            OK = False
             Debug.WriteLine("Task Open File " + ex.Message)
         End Try
     End Sub

