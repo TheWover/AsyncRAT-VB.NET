@@ -11,7 +11,6 @@ Imports System.Net.Sockets
 Public Class Client
 
     Public ClientSocket As Socket = Nothing
-    Public ServerSocket As Server = Nothing
     Public IsConnected As Boolean = False
     Public BufferLength As Long = Nothing
     Public BufferLengthReceived As Boolean = False
@@ -20,6 +19,7 @@ Public Class Client
     Public IP As String = Nothing
     Public LV As ListViewItem = Nothing
     Public SendSync As Object = Nothing
+    Public ID As String = Nothing
 
     Sub New(ByVal CL As Socket)
 
@@ -42,7 +42,7 @@ Public Class Client
     End Sub
 
     Async Sub BeginReceive(ByVal ar As IAsyncResult)
-        If IsConnected = False OrElse Not ClientSocket.Connected Then
+        If Not IsConnected OrElse Not ClientSocket.Connected Then
             isDisconnected()
             Exit Sub
         End If
@@ -66,6 +66,7 @@ Public Class Client
                     If (MS.Length = BufferLength) Then
                         Dim ClientReq As New Incoming_Requests(Me, MS.ToArray)
                         Pending.Req_In.Add(ClientReq)
+                        Settings.Received += MS.Length
                         MS.Dispose()
                         MS = New MemoryStream
                         Buffer = New Byte(0) {}
@@ -87,25 +88,28 @@ Public Class Client
 
     Sub BeginSend(ParamArray Msgs As Object())
         SyncLock SendSync
-            If IsConnected OrElse ClientSocket.Connected Then
-                Try
-                    Dim Packer As New Pack
-                    Dim Data As Byte() = Packer.Serialize(Msgs)
-
-                    Using MS As New MemoryStream
-                        Dim b As Byte() = AES_Encryptor(Data)
-                        Dim L As Byte() = SB(b.Length & CChar(vbNullChar))
-                        MS.Write(L, 0, L.Length)
-                        MS.Write(b, 0, b.Length)
-
-                        ClientSocket.Poll(-1, SelectMode.SelectWrite)
-                        ClientSocket.BeginSend(MS.ToArray, 0, MS.Length, SocketFlags.None, New AsyncCallback(AddressOf EndSend), Nothing)
-                    End Using
-                Catch ex As Exception
-                    Debug.WriteLine("BeginSend " + ex.Message)
-                    isDisconnected()
-                End Try
+            If Not IsConnected OrElse Not ClientSocket.Connected Then
+                isDisconnected()
+                Exit Sub
             End If
+            Try
+                Dim Packer As New Pack
+                Dim Data As Byte() = Packer.Serialize(Msgs)
+
+                Using MS As New MemoryStream
+                    Dim b As Byte() = AES_Encryptor(Data)
+                    Dim L As Byte() = SB(b.Length & CChar(vbNullChar))
+                    MS.Write(L, 0, L.Length)
+                    MS.Write(b, 0, b.Length)
+
+                    ClientSocket.Poll(-1, SelectMode.SelectWrite)
+                    ClientSocket.BeginSend(MS.ToArray, 0, MS.Length, SocketFlags.None, New AsyncCallback(AddressOf EndSend), Nothing)
+                    Settings.Sent += MS.Length
+                End Using
+            Catch ex As Exception
+                Debug.WriteLine("BeginSend " + ex.Message)
+                isDisconnected()
+            End Try
         End SyncLock
     End Sub
 
@@ -131,13 +135,12 @@ Public Class Client
                 Else
                     LV.Remove()
                     Messages.ClinetLog(Me, "Disconnected", Color.Red)
+                    Settings.Online.Remove(Me)
                 End If
             End If
         Catch ex As Exception
             Debug.WriteLine("L.Remove " + ex.Message)
         End Try
-
-        Settings.Online.Remove(Me)
 
         Try
             ClientSocket.Close()

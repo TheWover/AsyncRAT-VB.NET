@@ -27,6 +27,7 @@
                         F.LV1.Items.Insert(0, CurrentClient.LV)
                         ClinetLog(CurrentClient, "Connected", Color.Green)
                         Settings.Online.Add(CurrentClient)
+                        CurrentClient.ID = CurrentClient.LV.SubItems(F._ID.Index).Text
                     End If
                     Exit Select
 
@@ -35,6 +36,9 @@
                         F.BeginInvoke(New _Read(AddressOf Read), New Object() {CurrentClient, Data})
                         Exit Sub
                     Else
+                        If CurrentClient.LV.ForeColor = Color.Red Then
+                            CurrentClient.LV.ForeColor = Color.Empty
+                        End If
                         Dim RD As RemoteDesktop = My.Application.OpenForms("RD" + CurrentClient.IP)
                         If RD Is Nothing Then
                             RD = New RemoteDesktop With {
@@ -68,11 +72,26 @@
                     Exit Select
 
                 Case PacketHeader.ErrorMassages
-                    ClinetLog(CurrentClient, itm(1), Color.Black)
+                    If F.LV1.InvokeRequired Then
+                        F.LV1.BeginInvoke(New _Read(AddressOf Read), New Object() {CurrentClient, Data})
+                        Exit Sub
+                    Else
+                        If CurrentClient.LV.ForeColor = Color.Red Then
+                            CurrentClient.LV.ForeColor = Color.Empty
+                        End If
+                        ClinetLog(CurrentClient, itm(1), Color.Black)
+                    End If
                     Exit Select
 
                 Case PacketHeader.MsgReceived
-                    CurrentClient.LV.ForeColor = Nothing
+                    If F.LV1.InvokeRequired Then
+                        F.LV1.BeginInvoke(New _Read(AddressOf Read), New Object() {CurrentClient, Data})
+                        Exit Sub
+                    Else
+                        If CurrentClient.LV.ForeColor = Color.Red Then
+                            CurrentClient.LV.ForeColor = Color.Empty
+                        End If
+                    End If
                     Exit Select
 
 

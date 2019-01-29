@@ -4,7 +4,8 @@ Public Class RemoteDesktop
     Public F As Form1
     Public C As Client
     Public isOK As Boolean = False
-    Private Sub RemoteDesktop_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+    Private Async Sub RemoteDesktop_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        Await Task.Delay(250)
         Button1.PerformClick()
     End Sub
 

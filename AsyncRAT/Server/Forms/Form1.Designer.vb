@@ -61,6 +61,7 @@ Partial Class Form1
         Me.TaskMenu = New System.Windows.Forms.ContextMenuStrip(Me.components)
         Me.AddTaskToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
         Me.RemoveTaskToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.ColumnHeader1 = CType(New System.Windows.Forms.ColumnHeader(), System.Windows.Forms.ColumnHeader)
         Me.ClientMenu.SuspendLayout()
         Me.StatusStrip1.SuspendLayout()
         Me.TabControl1.SuspendLayout()
@@ -237,7 +238,7 @@ Partial Class Form1
         'Timer_Status
         '
         Me.Timer_Status.Enabled = True
-        Me.Timer_Status.Interval = 500
+        Me.Timer_Status.Interval = 1000
         '
         'TabControl1
         '
@@ -278,6 +279,7 @@ Partial Class Form1
         'LV2
         '
         Me.LV2.BorderStyle = System.Windows.Forms.BorderStyle.None
+        Me.LV2.Columns.AddRange(New System.Windows.Forms.ColumnHeader() {Me.ColumnHeader1})
         Me.LV2.Dock = System.Windows.Forms.DockStyle.Fill
         Me.LV2.Font = New System.Drawing.Font("Verdana", 8.0!, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, CType(0, Byte))
         Me.LV2.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None
@@ -287,7 +289,7 @@ Partial Class Form1
         Me.LV2.Size = New System.Drawing.Size(1022, 300)
         Me.LV2.TabIndex = 0
         Me.LV2.UseCompatibleStateImageBehavior = False
-        Me.LV2.View = System.Windows.Forms.View.List
+        Me.LV2.View = System.Windows.Forms.View.Details
         '
         'TabPage2
         '
@@ -412,4 +414,5 @@ Partial Class Form1
     Friend WithEvents _COUNTRY As ColumnHeader
     Friend WithEvents DROPANDEXECUTEToolStripMenuItem As ToolStripMenuItem
     Friend WithEvents LOADERToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents ColumnHeader1 As ColumnHeader
 End Class

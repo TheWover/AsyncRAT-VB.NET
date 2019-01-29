@@ -12,6 +12,7 @@ Enum PacketHeader
     Reflection = 7
     MsgReceived = 8
     Ping = 9
+    RunPE = 10
 End Enum
 
 

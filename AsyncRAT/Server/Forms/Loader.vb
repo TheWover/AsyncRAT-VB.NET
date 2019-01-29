@@ -2,20 +2,16 @@
     Public o As OpenFileDialog
     Public isOK As Boolean = False
     Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click
-        Me.Close()
+        Me.Hide()
     End Sub
 
     Private Sub ComboBox1_SelectedIndexChanged(sender As Object, e As EventArgs) Handles ComboBox1.SelectedIndexChanged
         If ComboBox1.SelectedIndex = 0 Then
             ComboBox2.Visible = True
             Label2.Visible = True
-            Button1.Enabled = False
-            Button2.Enabled = False
         Else
             ComboBox2.Visible = False
             Label2.Visible = False
-            Button1.Enabled = True
-            Button2.Enabled = True
         End If
     End Sub
 
@@ -25,11 +21,12 @@
             Try
                 Reflection.Assembly.LoadFile(o.FileName)
                 isOK = True
+                ToolStripStatusLabel1.ForeColor = Color.Green
                 ToolStripStatusLabel1.Text = IO.Path.GetFileName(o.FileName)
             Catch ex As Exception
                 isOK = False
-                MsgBox(IO.Path.GetFileName(o.FileName) + " is not a managed file.", MsgBoxStyle.Exclamation)
-                ToolStripStatusLabel1.Text = ""
+                ToolStripStatusLabel1.ForeColor = Color.Red
+                ToolStripStatusLabel1.Text = IO.Path.GetFileName(o.FileName) + " is not a managed file."
             End Try
         End If
     End Sub
