@@ -23,11 +23,7 @@ Public Class Server
             S.Bind(IpEndPoint)
             S.Listen(20)
 
-            While True
-                allDone.Reset()
-                S.BeginAccept(New AsyncCallback(AddressOf EndAccept), Nothing)
-                allDone.WaitOne()
-            End While
+            S.BeginAccept(New AsyncCallback(AddressOf EndAccept), Nothing)
 
         Catch ex As Exception
             MessageBox.Show(ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation, MessageBoxDefaultButton.Button1)
@@ -41,7 +37,7 @@ Public Class Server
         Catch ex As Exception
             Debug.WriteLine("EndAccept " + ex.Message)
         Finally
-            allDone.Set()
+            S.BeginAccept(New AsyncCallback(AddressOf EndAccept), Nothing)
         End Try
     End Sub
 
